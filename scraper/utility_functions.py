@@ -1,5 +1,4 @@
-# Some utility functions are stored here
-import numpy as np
+# letterboxd utility functions
 
 def stars2val(stars):
     """
