@@ -39,13 +39,14 @@ def scrape_page(page_soup: BeautifulSoup) -> list:
     page_films = []
     
     # Grab the main film grid
-    table = page_soup.find('ul', class_='poster-list')
+    table = page_soup.select('ul[class*="poster-list"]')[-1]
+
     if table is None:
-        return
+        return []
     
-    films = table.find_all('li')
+    films = table.select('li[class*="poster-container"]')
     if films == []:
-        return 
+        return []
     
     # Iterate through films
     for film in films:
@@ -55,10 +56,13 @@ def scrape_page(page_soup: BeautifulSoup) -> list:
     return page_films
         
 def scrape_film(film_html: Tag) -> dict:
-    film_dict = {}
-    film_dict["title"] = film_html.find("div", {"class" : "poster"}).attrs['data-film-slug']
+    try:
+        film_dict = {}
+        film_dict["title"] = film_html.find("div", {"class" : "poster"}).attrs['data-film-slug']
 
-    starval = film_html.select('span[class*="rating"]')[-1].get_text()
-    film_dict["rating"] = stars2val(starval)
-    
-    return film_dict
+        starval = film_html.select('span[class*="rating"]')[-1]
+
+        film_dict["rating"] = stars2val(starval)
+        return film_dict
+    except:
+        return {}
