@@ -1,3 +1,3 @@
 # Cinect
 
-## Most amazing movie recommender
+## MOSt amzing movie reeconmender
