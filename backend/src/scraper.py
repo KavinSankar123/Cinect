@@ -5,7 +5,15 @@ from utility_functions import stars2val
 
 _domain = 'https://letterboxd.com/'
 
-
+# return true if the username represents a user on the site
+def is_valid_url(letterboxd_username: str) -> bool:
+    try:
+        list_url = username_to_url(letterboxd_username)
+        page_response = get_page(list_url)
+        return True
+    except:
+        return False
+        
 def scrape_list(letterboxd_username: str) -> list:
     list_url = username_to_url(letterboxd_username)
     list_films = []
