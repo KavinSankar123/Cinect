@@ -2,7 +2,7 @@ import pandas as pd
 from collections import defaultdict
 from surprise import Dataset, Reader, SVD
 
-# User provided ratings
+# User provided ratings (ideally would be the entire group added into one dataframe)
 user_ratings = [
     {"user_id": 1, "movie_name": "Avatar: The Way of Water (2022)", "rating": 3.0},
     {"user_id": 1, "movie_name": "Glass Onion (2022)", "rating": 3.5},
@@ -60,8 +60,8 @@ for rating in user_ratings:
 # Convert user ratings to DataFrame
 user_ratings_df = pd.DataFrame(user_ratings)
 
-# Duplicate the user ratings, e.g., 10 times to increase their influence
-user_ratings_df = pd.concat([user_ratings_df] * 10, ignore_index=True)
+# Duplicate the user ratings, e.g., 100 times to increase their influence
+user_ratings_df = pd.concat([user_ratings_df] * 100, ignore_index=True)
 
 # Load the built-in MovieLens dataset
 data = Dataset.load_builtin('ml-1m')
@@ -103,8 +103,8 @@ testset = trainset.build_anti_testset()
 predictions = algo.test(testset)
 top_n = get_top_n(predictions, n=10)
 
-# Display the top N recommendations for user '1', converting IDs to movie names
-print(f"Top 10 recommendations for user '1':")
+# Display the top N recommendations
+print(f"Top 10 recommendations:")
 for movie_id, rating in top_n['1']:
     movie_name = movies_df.loc[movies_df['movieId'] == int(movie_id), 'title'].values[0] if movie_id != "Unknown" else "Unknown Movie"
     print(f"{movie_name}: {rating:.2f}")
