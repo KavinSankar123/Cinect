@@ -1,11 +1,13 @@
 import pandas as pd
 from surprise import Dataset, Reader, SVD
 
-movies_df = pd.read_csv('movies.csv')
+movies_df = pd.read_csv('movie_nonnull.csv')
 
 user_ratings = [
-    {'user_id': '1', 'movie_name': 'Barbie', 'rating': 5},
-    {'user_id': '2', 'movie_name': 'Knives Out', 'rating': 4},
+    {'user_id': '1', 'movie_name': 'Cult of Chucky', 'rating': 5},
+    {'user_id': '1', 'movie_name': 'Knives Out', 'rating': 4},
+    {'user_id': '1', 'movie_name': 'Lost Sun', 'rating': 1},
+    {'user_id': '1', 'movie_name': 'The Beirut Apt', 'rating': 1}
 ]
 
 ratings_df = pd.DataFrame(user_ratings)
@@ -32,4 +34,5 @@ recommendations = sorted(ratings, key=lambda x: x[1], reverse=True)
 
 # Recommend the top movie (or top N movies)
 top_recommendation = recommendations[0]
+print(f"Recommendations {recommendations}")
 print(f"Top recommendation for user {user_id}: {top_recommendation[0]} with estimated rating of {top_recommendation[1]}")
