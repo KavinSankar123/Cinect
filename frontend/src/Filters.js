@@ -3,9 +3,12 @@ import React, { useState } from 'react';
 //import './yearStyles.css'; // Import your CSS file
 
 
-function Filters({ users, addUser, addGenres, addMinYear, addMaxYear}) {
+function Filters({ users, addUser, genres, addGenre, removeGenre, addMinYear, addMaxYear}) {
     //USERS
     const [user, setUser] = useState(""); // State to store the input value
+    const [isOpen, setIsOpen] = useState(false);
+    const [minYear, setMinYear] = useState([]);
+    const [maxYear, setMaxYear] = useState([]);
 
     const handleInputChange = (event) => {
         setUser(event.target.value); // Update the state with the input value
@@ -16,63 +19,14 @@ function Filters({ users, addUser, addGenres, addMinYear, addMaxYear}) {
         setUser(""); // Clear the input field after adding the user
     };
 
-    const userList = users.map((user, num) => {
-        return (
-          <li key={num}>{user}</li>
-        );
-      });
+    const userList = users.map((user, num) => <li key={num}>{user}</li>);
 
 
-    //GENRES
-    const [genre, setGenre] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-      };
-    
-      // Function to handle click on an item
-      const toggleItem = (item) => {
-        if (genre.includes(item)) {
-            setGenre(genre.filter((selectedItem) => selectedItem !== item));
-        } else {
-            addGenres(genre);
-            setGenre([...genre, item]);
-        }
-      };
-    
-      const handleCheckboxChange = (item) => {
-        toggleItem(item);
-      };
-
-      const options = [
-        'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 
-        'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
-        'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War',  'Western'
-      ];
-
-    //YEARS
-    const [minYear, setMinYear] = useState([]);
-    const [maxYear, setMaxYear] = useState([]);
-
-    const handleMinChange = (newValues) => {
-        setMinYear(newValues.target.value);
-        //addMinYear(minYear[0]);
-        //setMinYear(newValues);
-    }
-
-    const handleUpdateMinYear = () => {
-        addMinYear(minYear);
-    };
-
-    const handleMaxChange = (newValues) => {
-        setMaxYear(newValues.target.value);
-    }
-    
-    const handleUpdateMaxYear = () => {
-        addMaxYear(minYear); // Call the addUser function with the input value
-    };
-
+    const options = [
+    'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 
+    'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
+    'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War',  'Western'
+    ];
 
     return (
         <div>
@@ -85,7 +39,7 @@ function Filters({ users, addUser, addGenres, addMinYear, addMaxYear}) {
             <br></br>
             <br></br>
             
-            <button onClick={toggleDropdown} className="dropbtn">Select genres</button>
+            <button onClick={() => setIsOpen(!isOpen)} className="dropbtn">Select genres</button>
                 {isOpen && (
                     <div className="dropdown-content">
                         {options.map((option, index) => (
@@ -93,8 +47,8 @@ function Filters({ users, addUser, addGenres, addMinYear, addMaxYear}) {
                             <label className="dropdown-item">
                             <input
                                 type="checkbox"
-                                checked={genre.includes(option)}
-                                onChange={() => handleCheckboxChange(option)}
+                                checked={genres.includes(option)}
+                                onChange={() => genres.includes(option) ? removeGenre(option) : addGenre(option)}
                             />
                             {option}
                             </label>
@@ -108,11 +62,11 @@ function Filters({ users, addUser, addGenres, addMinYear, addMaxYear}) {
 
             <h2>Enter a Range of Years</h2>
                 <p>Provide a date range for your recommended movie .</p>
-                <label>Released After: </label><input type="text" value={minYear} onChange={handleMinChange} />
-                <button onClick={handleUpdateMinYear}>Add lower bound</button>
+                <label>Released After: </label><input type="text" value={minYear} onChange={(newValues) => setMinYear(newValues.target.value)} />
+                <button onClick={() => addMinYear(minYear)}>Add lower bound</button>
                 <br></br>
-                <label>Released Before: </label><input type="text" value={maxYear} onChange={handleMaxChange} />
-                <button onClick={handleUpdateMaxYear}>Add Upper bound</button>
+                <label>Released Before: </label><input type="text" value={maxYear} onChange={(newValues) => setMaxYear(newValues.target.value)} />
+                <button onClick={() => addMaxYear(maxYear)}>Add Upper bound</button>
                 
         </div>
     );

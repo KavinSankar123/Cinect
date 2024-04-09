@@ -25,9 +25,14 @@ function App() {
       }, []);
   }
 
-  function addGenres(genre) {
+  function addGenre(genre) {
     const newGenre = [...genres, genre];
     setGenres(newGenre);
+  }
+
+  function removeGenre(genre) {
+    const newGenres = genres.filter((gen) => gen !== genre);
+    setGenres(newGenres);
   }
 
   function addMinYear(year) {
@@ -44,10 +49,10 @@ function App() {
 
   function getRecommendation() {
     const dict = {
-      users: users, 
-      genres: genres, 
+      users: users,
+      genres: genres,
       start_year: minYear,
-      end_year: maxYear
+      end_year: maxYear,
     };
     console.log(JSON.stringify(dict));
     fetch("/getRecommendation?data=" + JSON.stringify(dict))
@@ -67,10 +72,20 @@ function App() {
 
   return (
     <Grid container spacing={2} direction="row">
-      <Grid className='left' item xs={6}>
-        <Filters users={users} addUser={addUser} addGenres={addGenres} addMinYear={addMinYear} addMaxYear={addMaxYear} />
+      <Grid className="left" item xs={6}>
+        <Filters
+          users={users}
+          addUser={addUser}
+          genres={genres}
+          addGenre={addGenre}
+          removeGenre={removeGenre}
+          minYear={minYear}
+          addMinYear={addMinYear}
+          maxYear={maxYear}
+          addMaxYear={addMaxYear}
+        />
       </Grid>
-      <Grid className='right' item xs={6}>
+      <Grid className="right" item xs={6}>
         <Recommendations
           getRecommendation={getRecommendation}
           recommendation={recommendation}
