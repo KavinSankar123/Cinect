@@ -22,8 +22,11 @@ def get_recommendation():
     json_str=str(request.args.get("data"))
     json = loads(json_str)
     users = json["users"]
+    # for each user call scrape_list()
     genres = json["genres"]
-    streaming_platforms = json["streaming_platforms"]
+    # filter the list by genre
+    # transform movie names to movie ids, cluster each remaining movie and then run kavin's algorithm
     start_year = json["start_year"]
     end_year = json["end_year"]
-    return {'response': f"Generated recommendation using: {json}"}
+    # filter by year
+    return {'response': f"Barbie"}

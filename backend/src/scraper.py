@@ -74,10 +74,8 @@ def scrape_film(film_html: Tag) -> dict:
     try:
         film_dict = {}
         film_dict["title"] = film_html.find("div", {"class" : "poster"}).attrs['data-film-slug']
-
         starval = film_html.select('span[class*="rating"]')[-1]
-
-        film_dict["rating"] = stars2val(starval)
+        film_dict["rating"] = stars2val(starval.text)
         return film_dict
     except:
         return {}
