@@ -109,12 +109,12 @@ class ItemItemWithKNNRec:
         return group_rec
 
 
-desired_genres = {'Adventure', 'Action', 'Thriller', 'Romance'}
-item_item_recommender = ItemItemWithKNNRec()
-
-group_rec = item_item_recommender.find_group_rec(
-    group_movie_list_ids=[1, 2, 3, 4, 5, 6, 7, 8],
-    desired_genres=desired_genres
-)
-
-print(group_rec)
+# desired_genres = {'Adventure', 'Action', 'Thriller', 'Romance'}
+# item_item_recommender = ItemItemWithKNNRec()
+#
+# group_rec = item_item_recommender.find_group_rec(
+#     group_movie_list_ids=[1, 2, 3, 4, 5, 6, 7, 8],
+#     desired_genres=desired_genres
+# )
+#
+# print(group_rec)
