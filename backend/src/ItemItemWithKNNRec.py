@@ -1,62 +1,55 @@
 from typing import List
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix
-from sklearn.decomposition import TruncatedSVD
-from sklearn.neighbors import NearestNeighbors
+import joblib
+from os import environ
+from google.cloud import firestore
 
 
 class ItemItemWithKNNRec:
     def __init__(self):
-        self.ratings = pd.read_csv("ratings.csv")
-        self.movies = pd.read_csv("movies.csv")
+        self.movies = pd.DataFrame(self.fetch_movie_info())
         self.movie_titles = dict(zip(self.movies['movieId'], self.movies['title']))
+        self.k = 100
 
-        self.X, self.user_mapper, self.movie_mapper, self.user_inv_mapper, self.movie_inv_mapper = self.create_X(
-            self.ratings)
+        self.Q = joblib.load("saved_Q.joblib")
+        self.user_mapper = joblib.load("saved_user_mapper.joblib")
+        self.movie_mapper = joblib.load("saved_movie_mapper.joblib")
+        self.user_inv_mapper = joblib.load("saved_user_inv_mapper.joblib")
+        self.movie_inv_mapper = joblib.load("saved_movie_inv_mapper.joblib")
+        self.saved_kNN = joblib.load("kNN_model.joblib")
 
-        self.svd = TruncatedSVD(n_components=20, n_iter=10)
-        self.Q = self.svd.fit_transform(self.X.T)
+    def fetch_movie_info(self):
+        key_file_path = 'cinectmoviedb-665d236ba447.json'.format(environ['HOME'])
+        environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
+        project = 'cinectmoviedb'
+        client = firestore.Client(project=project, database='cinectdatabase')
 
-    def create_X(self, df):
-        """
-        Generates a sparse matrix from ratings dataframe.
+        collection_ref = client.collection('movie_info')
+        page_size = 50
+        query = collection_ref.limit(page_size)
+        all_documents = []
 
-        Args:
-            df: pandas dataframe containing 3 columns (userId, movieId, rating)
+        while True:
+            docs = query.get()
+            for d in docs:
+                all_documents.append(d.to_dict())
 
-        Returns:
-            X: sparse matrix
-            user_mapper: dict that maps user id's to user indices
-            user_inv_mapper: dict that maps user indices to user id's
-            movie_mapper: dict that maps movie id's to movie indices
-            movie_inv_mapper: dict that maps movie indices to movie id's
-        """
-        M = df['userId'].nunique()
-        N = df['movieId'].nunique()
+            if len(docs) < page_size:
+                break
 
-        user_mapper = dict(zip(np.unique(df["userId"]), list(range(M))))
-        movie_mapper = dict(zip(np.unique(df["movieId"]), list(range(N))))
+            last_doc = docs[-1]
+            query = collection_ref.start_after(last_doc)
 
-        user_inv_mapper = dict(zip(list(range(M)), np.unique(df["userId"])))
-        movie_inv_mapper = dict(zip(list(range(N)), np.unique(df["movieId"])))
+        return all_documents
 
-        user_index = [user_mapper[i] for i in df['userId']]
-        item_index = [movie_mapper[i] for i in df['movieId']]
-
-        X = csr_matrix((df["rating"], (user_index, item_index)), shape=(M, N))
-
-        return X, user_mapper, movie_mapper, user_inv_mapper, movie_inv_mapper
-
-    def find_similar_movies(self, movie_id, X, movie_mapper, movie_inv_mapper, k, metric) -> List:
+    def find_similar_movies(self, movie_id, X, movie_mapper, movie_inv_mapper) -> List:
         """
         Finds k-nearest neighbours for a given movie id.
 
         Args:
             movie_id: id of the movie of interest
             X: user-item utility matrix
-            k: number of similar movies to retrieve
-            metric: distance metric for kNN calculations
 
         Output: returns list of k similar movie ID's
         """
@@ -65,13 +58,11 @@ class ItemItemWithKNNRec:
 
         movie_ind = movie_mapper[movie_id]
         movie_vec = X[movie_ind]
-        if isinstance(movie_vec, (np.ndarray)):
+        if isinstance(movie_vec, np.ndarray):
             movie_vec = movie_vec.reshape(1, -1)
-        # use k+1 since kNN output includes the movieId of interest
-        kNN = NearestNeighbors(n_neighbors=k + 1, algorithm="auto", metric=metric)
-        kNN.fit(X)
-        neighbour = kNN.kneighbors(movie_vec, return_distance=False)
-        for i in range(0, k):
+
+        neighbour = self.saved_kNN.kneighbors(movie_vec, return_distance=False)
+        for i in range(0, self.k):
             n = neighbour.item(i)
             neighbour_ids.append(movie_inv_mapper[n])
         neighbour_ids.pop(0)
@@ -90,10 +81,9 @@ class ItemItemWithKNNRec:
         return highest_freq
 
     def filter_movies(self, initial_recs: List[list], genres: set):
-        movies_df = pd.read_csv("movies.csv")
         movie_to_genre_dict = {}
 
-        for row, col in movies_df.iterrows():
+        for row, col in self.movies.iterrows():
             movie_to_genre_dict[col.loc['title']] = set(col.loc['genres'].split('|'))
 
         filtered_movies = []
@@ -107,26 +97,24 @@ class ItemItemWithKNNRec:
 
         return filtered_movies
 
-    def find_group_rec(self, group_movie_list_ids: List[int], desired_genres: set, k: int, metric: str) -> list:
+    def find_group_rec(self, group_movie_list_ids: List[int], desired_genres: set) -> list:
         group_rec = []
         for m_id in group_movie_list_ids:
-            output_m_ids = self.find_similar_movies(m_id, self.Q.T, self.movie_mapper, self.movie_inv_mapper, k, metric)
+            output_m_ids = self.find_similar_movies(m_id, self.Q.T, self.movie_mapper, self.movie_inv_mapper)
             m_titles = [self.movie_titles[i] for i in output_m_ids]
             group_rec.append(m_titles)
 
         group_rec = self.filter_movies(initial_recs=group_rec, genres=desired_genres)
         group_rec = self.rank_movie_score(group_rec)
-
         return group_rec
 
 
-# desired_genres = {'Adventure'}
+# desired_genres = {'Adventure', 'Action', 'Thriller', 'Romance'}
 # item_item_recommender = ItemItemWithKNNRec()
+#
 # group_rec = item_item_recommender.find_group_rec(
 #     group_movie_list_ids=[1, 2, 3, 4, 5, 6, 7, 8],
-#     desired_genres=desired_genres,
-#     k=100,
-#     metric="cosine"
+#     desired_genres=desired_genres
 # )
 #
 # print(group_rec)
