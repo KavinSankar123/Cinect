@@ -8,8 +8,6 @@ from google.cloud import firestore
 
 class ItemItemWithKNNRec:
     def __init__(self):
-        # self.ratings = pd.read_csv("ratings_large.csv")
-        # self.movies = pd.read_csv("movies_large.csv")
         self.movies = pd.DataFrame(self.fetch_movie_info())
         self.movie_titles = dict(zip(self.movies['movieId'], self.movies['title']))
         self.k = 100
