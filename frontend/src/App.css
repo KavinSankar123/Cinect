@@ -54,3 +54,17 @@
     /* Rotate the line to make it vertical */
   
 }
+
+.left {
+  display: flex;
+  place-items: center;
+  justify-content: center; /* Horizontally center */
+  align-items: center; /* Vertically center */
+}
+
+.right {
+  display: flex;
+  place-items: center;
+  justify-content: center; /* Horizontally center */
+  align-items: center; /* Vertically center */
+}
