@@ -8,6 +8,9 @@ function App() {
   const [recommendation, setRecommendation] = useState("");
   const [users, setUsers] = useState([]);
   const [poster, setPoster] = useState("");
+  const [genres, setGenres] = useState([]);
+  const [minYear, setMinYear] = useState("");
+  const [maxYear, setMaxYear] = useState("");
 
   function addUser(user) {
     if (user == "") return;
@@ -22,13 +25,29 @@ function App() {
       }, []);
   }
 
+  function addGenres(genre) {
+    const newGenre = [...genres, genre];
+    setGenres(newGenre);
+  }
+
+  function addMinYear(year) {
+    if (year < 1874 || year > 2019) year = 1874;
+    const newMin = [year];
+    setMinYear(newMin);
+  }
+
+  function addMaxYear(year) {
+    if (year < 1874 || year > 2019) year = 2019;
+    const newMax = [year];
+    setMaxYear(newMax);
+  }
+
   function getRecommendation() {
     const dict = {
-      users: users,
-      genres: [],
-      streaming_platforms: [],
-      start_year: 1900,
-      end_year: 2024,
+      users: users, 
+      genres: genres, 
+      start_year: minYear,
+      end_year: maxYear
     };
     console.log(JSON.stringify(dict));
     fetch("/getRecommendation?data=" + JSON.stringify(dict))
@@ -48,10 +67,10 @@ function App() {
 
   return (
     <Grid container spacing={2} direction="row">
-      <Grid item xs={6}>
-        <Filters users={users} addUser={addUser} />
+      <Grid className='left' item xs={6}>
+        <Filters users={users} addUser={addUser} addGenres={addGenres} addMinYear={addMinYear} addMaxYear={addMaxYear} />
       </Grid>
-      <Grid item xs={6}>
+      <Grid className='right' item xs={6}>
         <Recommendations
           getRecommendation={getRecommendation}
           recommendation={recommendation}
