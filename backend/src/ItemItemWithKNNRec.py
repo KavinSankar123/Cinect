@@ -2,6 +2,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 import joblib
+import datetime
 from os import environ
 from google.cloud import firestore
 
@@ -9,6 +10,7 @@ from google.cloud import firestore
 class ItemItemWithKNNRec:
     def __init__(self):
         self.movies = pd.DataFrame(self.fetch_movie_info())
+        # self.movies = pd.read_csv('movies_large.csv')
         self.movie_titles = dict(zip(self.movies['movieId'], self.movies['title']))
         self.k = 100
 
@@ -80,41 +82,64 @@ class ItemItemWithKNNRec:
         highest_freq = sorted(movie_freq.items(), key=lambda x: x[1], reverse=True)
         return highest_freq
 
-    def filter_movies(self, initial_recs: List[list], genres: set):
-        movie_to_genre_dict = {}
+    def filter_movies(self, initial_recs: List[list], genres: set, start_end_year: List[int]):
+        def filter_by_genre():
+            movie_to_genre_dict = {}
 
-        for row, col in self.movies.iterrows():
-            movie_to_genre_dict[col.loc['title']] = set(col.loc['genres'].split('|'))
+            for row, col in self.movies.iterrows():
+                movie_to_genre_dict[col.loc['title']] = set(col.loc['genres'].split('|'))
 
-        filtered_movies = []
-        for movie_list in initial_recs:
-            temp = []
-            for movie in movie_list:
-                intersect = movie_to_genre_dict[movie].intersection(genres)
-                if len(intersect) > 0:
-                    temp.append(movie)
-            filtered_movies.append(temp)
+            filtered_movies = []
+            for movie_list in initial_recs:
+                temp = []
+                for movie in movie_list:
+                    intersect = movie_to_genre_dict[movie].intersection(genres)
+                    if len(intersect) > 0:
+                        temp.append(movie)
+                filtered_movies.append(temp)
+            return filtered_movies
 
+        def filter_by_year(movie_lists: List[list]):
+            if not start_end_year:
+                return movie_lists
+
+            final_rec = []
+            start_year = min(start_end_year)
+            end_year = datetime.datetime.now().year if len(start_end_year) == 1 else max(start_end_year)
+
+            for group in movie_lists:
+                temp = []
+                for movie_title in group:
+                    year = int(movie_title[-5:-1])
+                    if start_year <= year <= end_year:
+                        temp.append(movie_title)
+                final_rec.append(temp)
+            return final_rec
+
+        filtered_movies = filter_by_genre()
+        filtered_movies = filter_by_year(filtered_movies)
         return filtered_movies
 
-    def find_group_rec(self, group_movie_list_ids: List[int], desired_genres: set) -> list:
+    def find_group_rec(self, group_movie_list_ids: List[int], desired_genres: set, start_end_year: List[int]) -> list:
         group_rec = []
         for m_id in group_movie_list_ids:
             output_m_ids = self.find_similar_movies(m_id, self.Q.T, self.movie_mapper, self.movie_inv_mapper)
             m_titles = [self.movie_titles[i] for i in output_m_ids]
             group_rec.append(m_titles)
 
-        group_rec = self.filter_movies(initial_recs=group_rec, genres=desired_genres)
+        group_rec = self.filter_movies(initial_recs=group_rec, genres=desired_genres, start_end_year=start_end_year)
         group_rec = self.rank_movie_score(group_rec)
         return group_rec
 
 
 # desired_genres = {'Adventure', 'Action', 'Thriller', 'Romance'}
+# start_end_year = [1991, 2005]
 # item_item_recommender = ItemItemWithKNNRec()
 #
 # group_rec = item_item_recommender.find_group_rec(
 #     group_movie_list_ids=[1, 2, 3, 4, 5, 6, 7, 8],
-#     desired_genres=desired_genres
+#     desired_genres=desired_genres,
+#     start_end_year=start_end_year
 # )
 #
 # print(group_rec)

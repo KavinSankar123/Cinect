@@ -13,7 +13,7 @@ function App() {
   const [maxYear, setMaxYear] = useState("");
 
   function addUser(user) {
-    if (user == "") return;
+    if (user === "") return;
     let validUrl;
     fetch("/verifyUser?user=" + user)
       .then((res) => res.json())

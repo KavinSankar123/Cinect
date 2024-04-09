@@ -3,6 +3,7 @@ from flask import request
 from flask import Flask
 from scraper import is_valid_url
 from json import loads
+from scraper import scrape_list
 
 app = Flask(__name__)
 
@@ -22,11 +23,10 @@ def get_recommendation():
     json_str=str(request.args.get("data"))
     json = loads(json_str)
     users = json["users"]
-    # for each user call scrape_list()
+    movies = [scrape_list(user) for user in users]
     genres = json["genres"]
-    # filter the list by genre
-    # transform movie names to movie ids, cluster each remaining movie and then run kavin's algorithm
-    start_year = json["start_year"]
-    end_year = json["end_year"]
-    # filter by year
+    start_end_year = [json["start_year"], json["end_year"]]
+    # in the backend backend, use the user's top rated movies for the input (rating >= 4.0)
+    # input to recommender will be movie titles from letterbox that is not in correct format
+    # call kavin function
     return {'response': f"Barbie"}
