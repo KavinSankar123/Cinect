@@ -1,11 +1,13 @@
-import time
-from flask import request
-from flask import Flask
-from scraper import is_valid_url
 from json import loads
+
+from flask import Flask
+from flask import request
+
+from scraper import is_valid_url
 from scraper import scrape_list
 
 app = Flask(__name__)
+
 
 # verify whether a username is valid
 # /verifyUser?user=<username>
@@ -15,12 +17,13 @@ def verify_user():
     result = is_valid_url(letterboxd_username)
     return {'response': result}
 
+
 # return a movie recommendation (or potentially list of movie recs??? not sure yet)
 # /getRecommendation?data={'users': string[], 'genres': string[], 
 # 'streaming_platforms': string[], 'start_year': int, 'end_year': int}
 @app.route('/getRecommendation')
 def get_recommendation():
-    json_str=str(request.args.get("data"))
+    json_str = str(request.args.get("data"))
     json = loads(json_str)
     users = json["users"]
     movies = [scrape_list(user) for user in users]

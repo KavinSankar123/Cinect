@@ -1,9 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+
 from utility_functions import stars2val
 
 _domain = 'https://letterboxd.com/'
+
 
 # return true if the username represents a user on the site
 def is_valid_url(letterboxd_username: str) -> bool:
@@ -13,7 +15,8 @@ def is_valid_url(letterboxd_username: str) -> bool:
         return True
     except:
         return False
-        
+
+
 def scrape_list(letterboxd_username: str) -> list:
     list_url = username_to_url(letterboxd_username)
     list_films = []
@@ -54,11 +57,11 @@ def scrape_page(page_soup: BeautifulSoup) -> list:
 
     if table is None:
         return []
-    
+
     films = table.select('li[class*="poster-container"]')
     if films == []:
         return []
-    
+
     films = table.find_all('li')
     if not films:
         return []
@@ -69,11 +72,12 @@ def scrape_page(page_soup: BeautifulSoup) -> list:
         page_films.append(film_dict)
 
     return page_films
-        
+
+
 def scrape_film(film_html: Tag) -> dict:
     try:
         film_dict = {}
-        film_dict["title"] = film_html.find("div", {"class" : "poster"}).attrs['data-film-slug']
+        film_dict["title"] = film_html.find("div", {"class": "poster"}).attrs['data-film-slug']
         starval = film_html.select('span[class*="rating"]')[-1]
         film_dict["rating"] = stars2val(starval.text)
         return film_dict
