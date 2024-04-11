@@ -1,10 +1,11 @@
-from json import loads
+import json
 
 from flask import Flask
 from flask import request
 
+from ItemItemWithKNNRec import ItemItemWithKNNRec
+from scraper import extract_titles
 from scraper import is_valid_url
-from scraper import scrape_list
 
 app = Flask(__name__)
 
@@ -24,12 +25,21 @@ def verify_user():
 @app.route('/getRecommendation')
 def get_recommendation():
     json_str = str(request.args.get("data"))
-    json = loads(json_str)
-    users = json["users"]
-    movies = [scrape_list(user) for user in users]
-    genres = json["genres"]
-    start_end_year = [json["start_year"], json["end_year"]]
+    json_obj = json.loads(json_str)
+
+    input_movie_list = extract_titles(json_obj["users"])
+    genres = json_obj["genres"]
+    start_end_year = [json_obj["start_year"], json_obj["end_year"]]
+
     # in the backend backend, use the user's top rated movies for the input (rating >= 4.0)
     # input to recommender will be movie titles from letterbox that is not in correct format
     # call kavin function
-    return {'response': f"Barbie"}
+
+    item_item_recommender = ItemItemWithKNNRec()
+    movie_rec = item_item_recommender.get_group_recommendation(
+        input_movie_list=input_movie_list,
+        desired_genres=genres,
+        start_end_year=start_end_year
+    )
+
+    return {'response': f"{movie_rec}"}

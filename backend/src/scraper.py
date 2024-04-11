@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from typing import List
 
 from utility_functions import stars2val
 
@@ -83,3 +84,15 @@ def scrape_film(film_html: Tag) -> dict:
         return film_dict
     except:
         return {}
+
+
+def extract_titles(users: List[str]) -> List[str]:
+    movies = []
+    for user in users:
+        movies.extend(scrape_list(user))
+
+    input_movie_set = set()
+    for title in movies:
+        if len(title) > 0 and title["rating"] >= 4.0:
+            input_movie_set.add(title["title"])
+    return list(input_movie_set)

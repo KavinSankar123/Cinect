@@ -4,13 +4,14 @@ import pandas as pd
 import joblib
 import datetime
 from os import environ
+from fuzzywuzzy import fuzz
 from google.cloud import firestore
 
 
 class ItemItemWithKNNRec:
     def __init__(self):
-        self.movies = pd.DataFrame(self.fetch_movie_info())
-        # self.movies = pd.read_csv('movies_large.csv')
+        # self.movies = pd.DataFrame(self.fetch_movie_info())
+        self.movies = pd.read_csv('movies_large.csv')
         self.movie_titles = dict(zip(self.movies['movieId'], self.movies['title']))
         self.k = 100
 
@@ -110,6 +111,8 @@ class ItemItemWithKNNRec:
             for group in movie_lists:
                 temp = []
                 for movie_title in group:
+                    if not movie_title[-5:-1].isdigit():
+                        continue
                     year = int(movie_title[-5:-1])
                     if start_year <= year <= end_year:
                         temp.append(movie_title)
@@ -120,7 +123,42 @@ class ItemItemWithKNNRec:
         filtered_movies = filter_by_year(filtered_movies)
         return filtered_movies
 
-    def find_group_rec(self, group_movie_list_ids: List[int], desired_genres: set, start_end_year: List[int]) -> list:
+    def find_similiar_movie_titles(self, website_titles: List[str]):
+        def clean_website_title(title):
+            return title.replace("-", " ").lower().strip()
+
+        cleaned_website_titles = [clean_website_title(t) for t in website_titles]
+
+        cleaned_dataset_titles = []
+        for row, col in self.movies.iterrows():
+            cleaned_dataset_titles.append(col.loc['title'])
+
+        # Matching loop
+        best_matched_titles = []
+        for website_title in cleaned_website_titles:
+            best_match = None
+            best_score = -float("inf")
+            for dataset_title in cleaned_dataset_titles:
+                score = fuzz.ratio(website_title, dataset_title)
+                if score > best_score:
+                    best_match = dataset_title
+                    best_score = score
+
+            best_matched_titles.append(best_match)
+        return best_matched_titles
+
+    def movie_titles_to_ids(self, input_movie_list: List[str]) -> List[int]:
+        title_to_id = self.movies.set_index('title')['movieId'].to_dict()
+
+        m_ids = []
+        for title in input_movie_list:
+            m_ids.append(title_to_id[title])
+        return m_ids
+
+    def get_group_recommendation(self, input_movie_list: List[str], desired_genres: set, start_end_year: List[int]) -> list:
+        formatted_titles = self.find_similiar_movie_titles(input_movie_list)
+        group_movie_list_ids = self.movie_titles_to_ids(formatted_titles)
+
         group_rec = []
         for m_id in group_movie_list_ids:
             output_m_ids = self.find_similar_movies(m_id, self.Q.T, self.movie_mapper, self.movie_inv_mapper)
@@ -132,14 +170,16 @@ class ItemItemWithKNNRec:
         return group_rec
 
 
-# desired_genres = {'Adventure', 'Action', 'Thriller', 'Romance'}
-# start_end_year = [1991, 2005]
-# item_item_recommender = ItemItemWithKNNRec()
+# genres = {'Adventure', 'Action'}
+# input_movie_list = ['iron-man-2008', 'shang-chi-and-the-legend-of-the-ten-rings', 'john-wick', 'whiplash-2014']
+# start_end_year = []
 #
-# group_rec = item_item_recommender.find_group_rec(
-#     group_movie_list_ids=[1, 2, 3, 4, 5, 6, 7, 8],
-#     desired_genres=desired_genres,
+# item_item_recommender = ItemItemWithKNNRec()
+# movie_rec = item_item_recommender.get_group_recommendation(
+#     input_movie_list=input_movie_list,
+#     desired_genres=genres,
 #     start_end_year=start_end_year
 # )
 #
-# print(group_rec)
+# print(movie_rec)
+#
