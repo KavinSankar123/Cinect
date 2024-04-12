@@ -29,7 +29,14 @@ def get_recommendation():
 
     input_movie_list = extract_titles(json_obj["users"])
     genres = json_obj["genres"]
-    start_end_year = [json_obj["start_year"], json_obj["end_year"]]
+    try:
+        start_end_year = [int(json_obj["start_year"]), int(json_obj["end_year"])]
+    except:
+        start_end_year = [1824, 2024]
+        
+    print(input_movie_list)
+    print(genres)
+    print(start_end_year)
 
     # in the backend backend, use the user's top rated movies for the input (rating >= 4.0)
     # input to recommender will be movie titles from letterbox that is not in correct format

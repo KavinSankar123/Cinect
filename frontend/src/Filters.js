@@ -7,8 +7,8 @@ function Filters({ users, addUser, genres, addGenre, removeGenre, addMinYear, ad
     //USERS
     const [user, setUser] = useState(""); // State to store the input value
     const [isOpen, setIsOpen] = useState(false);
-    const [minYear, setMinYear] = useState([]);
-    const [maxYear, setMaxYear] = useState([]);
+    const [minYear, setMinYear] = useState("");
+    const [maxYear, setMaxYear] = useState("");
 
     const handleInputChange = (event) => {
         setUser(event.target.value); // Update the state with the input value

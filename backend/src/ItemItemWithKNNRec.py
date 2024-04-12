@@ -1,3 +1,4 @@
+import os
 from typing import List
 import numpy as np
 import pandas as pd
@@ -6,24 +7,25 @@ import datetime
 from os import environ
 from fuzzywuzzy import fuzz
 from google.cloud import firestore
+from google.oauth2 import service_account
 
 
 class ItemItemWithKNNRec:
     def __init__(self):
-        # self.movies = pd.DataFrame(self.fetch_movie_info())
-        self.movies = pd.read_csv('movies_large.csv')
+        self.movies = pd.DataFrame(self.fetch_movie_info())
+        # self.movies = pd.read_csv('movies_large.csv')
         self.movie_titles = dict(zip(self.movies['movieId'], self.movies['title']))
         self.k = 100
 
-        self.Q = joblib.load("saved_Q.joblib")
-        self.user_mapper = joblib.load("saved_user_mapper.joblib")
-        self.movie_mapper = joblib.load("saved_movie_mapper.joblib")
-        self.user_inv_mapper = joblib.load("saved_user_inv_mapper.joblib")
-        self.movie_inv_mapper = joblib.load("saved_movie_inv_mapper.joblib")
-        self.saved_kNN = joblib.load("kNN_model.joblib")
+        self.Q = joblib.load("src/saved_Q.joblib")
+        self.user_mapper = joblib.load("src/saved_user_mapper.joblib")
+        self.movie_mapper = joblib.load("src/saved_movie_mapper.joblib")
+        self.user_inv_mapper = joblib.load("src/saved_user_inv_mapper.joblib")
+        self.movie_inv_mapper = joblib.load("src/saved_movie_inv_mapper.joblib")
+        self.saved_kNN = joblib.load("src/kNN_model.joblib")
 
     def fetch_movie_info(self):
-        key_file_path = 'cinectmoviedb-665d236ba447.json'.format(environ['HOME'])
+        key_file_path = os.getcwd() + 'src/cinectmoviedb-665d236ba447.json'
         environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
         project = 'cinectmoviedb'
         client = firestore.Client(project=project, database='cinectdatabase')
@@ -159,13 +161,16 @@ class ItemItemWithKNNRec:
         formatted_titles = self.find_similiar_movie_titles(input_movie_list)
         group_movie_list_ids = self.movie_titles_to_ids(formatted_titles)
 
+        print("Clustering...")
         group_rec = []
         for m_id in group_movie_list_ids:
             output_m_ids = self.find_similar_movies(m_id, self.Q.T, self.movie_mapper, self.movie_inv_mapper)
             m_titles = [self.movie_titles[i] for i in output_m_ids]
             group_rec.append(m_titles)
 
+        print("Filtering movies...")
         group_rec = self.filter_movies(initial_recs=group_rec, genres=desired_genres, start_end_year=start_end_year)
+        print("Ranking movies...")
         group_rec = self.rank_movie_score(group_rec)
         return group_rec
 

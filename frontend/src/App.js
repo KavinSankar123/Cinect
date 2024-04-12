@@ -37,13 +37,13 @@ function App() {
 
   function addMinYear(year) {
     if (year < 1874 || year > 2019) year = 1874;
-    const newMin = [year];
+    const newMin = year;
     setMinYear(newMin);
   }
 
   function addMaxYear(year) {
     if (year < 1874 || year > 2019) year = 2019;
-    const newMax = [year];
+    const newMax = year;
     setMaxYear(newMax);
   }
 
