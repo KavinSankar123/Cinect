@@ -181,9 +181,8 @@ class ItemItemWithKNNRec:
 
 
 # genres = {'Adventure', 'Action'}
-# input_movie_list = ['iron-man-2008', 'shang-chi-and-the-legend-of-the-ten-rings', 'john-wick', 'whiplash-2014']
+# input_movie_list = ['solo-a-star-wars-story', 'murder-on-the-orient-express-2017', '8-mile', 'avengers-infinity-war', 'kung-fu-panda', 'spider-man-no-way-home', 'toy-story', 'captain-america-civil-war', 'the-dark-knight-rises', 'life-itself-2018', 'coraline', 'the-shining', 'ratatouille', 'the-queens-gambit', 'shang-chi-and-the-legend-of-the-ten-rings', 'blackkklansman', 'spider-man-homecoming', 'train-to-busan', 'ant-man', 'up', 'star-wars-the-last-jedi', 'moonrise-kingdom', 'good-will-hunting', 'nope', 'joker-2019', 'batman-begins', 'the-matrix', 'wonder-2017', 'hidden-figures', 'holes', 'mulan', 'home-alone', 'doctor-strange-2016', 'zootopia', 'inception', 'despicable-me', 'star-wars', 'the-lion-king', 'the-dark-knight', 'the-hunger-games', 'interstellar', 'the-martian', 'quiz-show', 'school-of-rock', 'elf', 'oceans-eleven-2001', 'back-to-the-future-part-ii', 'harry-potter-and-the-goblet-of-fire', 'knives-out-2019', 'la-la-land', 'hamilton-2020', 'jumanji-welcome-to-the-jungle', 'black-panther', 'oceans-eight', 'harry-potter-and-the-chamber-of-secrets', 'harry-potter-and-the-order-of-the-phoenix', 'dont-worry-darling', 'superbad', 'back-to-the-future', 'big-hero-6', 'walle', 'coco-2017', 'lion', 'inside-man', 'rogue-one-a-star-wars-story', 'it-2017', 'were-the-millers', 'tenet', 'the-truman-show', '42']
 # start_end_year = []
-#
 # item_item_recommender = ItemItemWithKNNRec()
 # movie_rec = item_item_recommender.get_group_recommendation(
 #     input_movie_list=input_movie_list,
@@ -192,4 +191,3 @@ class ItemItemWithKNNRec:
 # )
 #
 # print(movie_rec)
-#
