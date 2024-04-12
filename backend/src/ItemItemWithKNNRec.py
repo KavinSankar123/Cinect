@@ -83,7 +83,11 @@ class ItemItemWithKNNRec:
                     movie_freq[movie] = 1
 
         highest_freq = sorted(movie_freq.items(), key=lambda x: x[1], reverse=True)
-        return highest_freq
+        final_list = []
+
+        for m in highest_freq:
+            final_list.append(m[0])
+        return final_list
 
     def filter_movies(self, initial_recs: List[list], genres: set, start_end_year: List[int]):
         def filter_by_genre():
