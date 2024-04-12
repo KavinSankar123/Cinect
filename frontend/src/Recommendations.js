@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 function Recommendations( {recommendation, getRecommendation, poster} ) {
-    const altText = poster == null ? "Poster for movie not found" : "";
+    const altText = poster === "N/A" || poster == null ? "Poster for movie not found" : "";
     return (
         <div>
             <h1>Your Recommendation</h1>

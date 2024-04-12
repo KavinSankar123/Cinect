@@ -25,7 +25,8 @@ class ItemItemWithKNNRec:
         self.saved_kNN = joblib.load("src/kNN_model.joblib")
 
     def fetch_movie_info(self):
-        key_file_path = os.getcwd() + 'src/cinectmoviedb-665d236ba447.json'
+        key_file_path = os.getcwd() + '/src/cinectmoviedb-665d236ba447.json'
+        print(key_file_path)
         environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
         project = 'cinectmoviedb'
         client = firestore.Client(project=project, database='cinectdatabase')

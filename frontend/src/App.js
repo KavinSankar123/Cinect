@@ -5,6 +5,7 @@ import "./App.css";
 import Grid from "@mui/material/Grid";
 
 function App() {
+  const [recommendations, setRecommendations] = useState([])
   const [recommendation, setRecommendation] = useState("");
   const [users, setUsers] = useState([]);
   const [poster, setPoster] = useState("");
@@ -58,13 +59,15 @@ function App() {
     fetch("/getRecommendation?data=" + JSON.stringify(dict))
       .then((res) => res.json())
       .then((data) => {
-        const recommendation = data.response;
-        fetch(`https://www.omdbapi.com/?t=${recommendation}&apikey=f9a2d5c8`)
+        const recommendations = data.response;
+        const bestRec = recommendations[0];
+        fetch(`https://www.omdbapi.com/?t=${bestRec}&apikey=f9a2d5c8`)
           .then((res) => res.json())
           .then((data) => {
             const newPoster = data["Poster"];
             console.log(newPoster);
-            setRecommendation(recommendation);
+            setRecommendation(bestRec);
+            setRecommendations(recommendations);
             setPoster(newPoster);
           }, []);
       }, []);

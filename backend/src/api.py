@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask import request
 
 from ItemItemWithKNNRec import ItemItemWithKNNRec
@@ -33,7 +33,7 @@ def get_recommendation():
         start_end_year = [int(json_obj["start_year"]), int(json_obj["end_year"])]
     except:
         start_end_year = [1824, 2024]
-        
+
     print(input_movie_list)
     print(genres)
     print(start_end_year)
@@ -48,5 +48,5 @@ def get_recommendation():
         desired_genres=genres,
         start_end_year=start_end_year
     )
-
-    return {'response': f"{movie_rec}"}
+    print({'response': movie_rec})
+    return jsonify({'response': movie_rec})
