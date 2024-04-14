@@ -6,6 +6,7 @@ from flask import request
 from ItemItemWithKNNRec import ItemItemWithKNNRec
 from scraper import extract_titles
 from scraper import is_valid_url
+from flask_cors import cross_origin
 
 app = Flask(__name__)
 
@@ -13,6 +14,7 @@ app = Flask(__name__)
 # verify whether a username is valid
 # /verifyUser?user=<username>
 @app.route('/verifyUser')
+@cross_origin()
 def verify_user():
     letterboxd_username = request.args.get("user")
     result = is_valid_url(letterboxd_username)
@@ -23,6 +25,7 @@ def verify_user():
 # /getRecommendation?data={'users': string[], 'genres': string[], 
 # 'streaming_platforms': string[], 'start_year': int, 'end_year': int}
 @app.route('/getRecommendation')
+@cross_origin()
 def get_recommendation():
     json_str = str(request.args.get("data"))
     json_obj = json.loads(json_str)

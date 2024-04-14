@@ -5,7 +5,7 @@ import "./App.css";
 import Grid from "@mui/material/Grid";
 
 function App() {
-  const [recommendations, setRecommendations] = useState([])
+  const [recommendations, setRecommendations] = useState([]);
   const [recommendation, setRecommendation] = useState("");
   const [users, setUsers] = useState([]);
   const [poster, setPoster] = useState("");
@@ -13,17 +13,25 @@ function App() {
   const [minYear, setMinYear] = useState("");
   const [maxYear, setMaxYear] = useState("");
 
-  function addUser(user) {
+  async function addUser(user) {
     if (user === "") return;
     let validUrl;
-    fetch("/verifyUser?user=" + user)
-      .then((res) => res.json())
-      .then((data) => {
-        validUrl = data.response;
-        if (!validUrl) return;
-        const newUsers = [...users, user];
-        setUsers(newUsers);
-      }, []);
+    console.log("fetching");
+    let response = await fetch(
+      "https://963c-208-89-33-105.ngrok-free.app/verifyUser?user=" + user,
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
+    console.log(response);
+    let json = await response.json();
+    validUrl = json.response;
+    if (!validUrl) return;
+    const newUsers = [...users, user];
+    setUsers(newUsers);
   }
 
   function addGenre(genre) {
@@ -48,7 +56,7 @@ function App() {
     setMaxYear(newMax);
   }
 
-  function getRecommendation() {
+  async function getRecommendation() {
     const dict = {
       users: users,
       genres: genres,
@@ -56,20 +64,27 @@ function App() {
       end_year: maxYear,
     };
     console.log(JSON.stringify(dict));
-    fetch("/getRecommendation?data=" + JSON.stringify(dict))
+    let response = await fetch(
+      "https://963c-208-89-33-105.ngrok-free.app/getRecommendation?data=" + JSON.stringify(dict),
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
+    console.log(response);
+    let json = await response.json();
+    const recommendations = json.response;
+    const bestRec = recommendations[0];
+    fetch(`https://www.omdbapi.com/?t=${bestRec}&apikey=f9a2d5c8`)
       .then((res) => res.json())
       .then((data) => {
-        const recommendations = data.response;
-        const bestRec = recommendations[0];
-        fetch(`https://www.omdbapi.com/?t=${bestRec}&apikey=f9a2d5c8`)
-          .then((res) => res.json())
-          .then((data) => {
-            const newPoster = data["Poster"];
-            console.log(newPoster);
-            setRecommendation(bestRec);
-            setRecommendations(recommendations);
-            setPoster(newPoster);
-          }, []);
+        const newPoster = data["Poster"];
+        console.log(newPoster);
+        setRecommendation(bestRec);
+        setRecommendations(recommendations);
+        setPoster(newPoster);
       }, []);
   }
 
