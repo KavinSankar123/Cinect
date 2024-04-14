@@ -52,7 +52,7 @@ env:
   PROJECT_ID: cinect-420301 # TODO: update Google Cloud project id
   GAR_LOCATION: YOUR_GAR_LOCATION # TODO: update Artifact Registry location
   SERVICE: cinect-run # TODO: update Cloud Run service name
-  REGION: us-east5-c # TODO: update Cloud Run service region
+  REGION: us-east5 # TODO: update Cloud Run service region
 
 jobs:
   deploy:
