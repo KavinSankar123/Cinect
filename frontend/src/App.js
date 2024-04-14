@@ -18,7 +18,7 @@ function App() {
     let validUrl;
     console.log("fetching");
     let response = await fetch(
-      "https://963c-208-89-33-105.ngrok-free.app/verifyUser?user=" + user,
+      "https://dynamic-tolerant-boa.ngrok-free.app/verifyUser?user=" + user,
       {
         headers: {
           "ngrok-skip-browser-warning": "true",
@@ -65,7 +65,7 @@ function App() {
     };
     console.log(JSON.stringify(dict));
     let response = await fetch(
-      "https://963c-208-89-33-105.ngrok-free.app/getRecommendation?data=" + JSON.stringify(dict),
+      "https://dynamic-tolerant-boa.ngrok-free.app/getRecommendation?data=" + JSON.stringify(dict),
       {
         headers: {
           "ngrok-skip-browser-warning": "true",
