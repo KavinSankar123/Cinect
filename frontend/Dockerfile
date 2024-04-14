@@ -14,10 +14,12 @@ RUN npm install
 COPY . .
 
 # Build the frontend application
-RUN npm run build
+# RUN npm list
+RUN npm run build 
+RUN npm install -g serve 
 
 # Expose the port on which the frontend will run
-EXPOSE 3000:3000
+EXPOSE 8080
 
 # Start the frontend application
-CMD ["npm", "run", "start-frontend"]
+CMD ["npx", "serve", "-s", "-l", "8080", "build"]
