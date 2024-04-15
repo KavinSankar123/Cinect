@@ -8,7 +8,7 @@ function Recommendations( {recommendation, getRecommendation, poster} ) {
             <h1>Your Recommendation</h1>
             <p>Insert plot summary, keywords...</p>
             <p>Recommendation: {recommendation}</p>
-            <button onClick={getRecommendation}>Get Recommendation</button>
+            <button class="button-31" onClick={getRecommendation}>Get Recommendation</button>
             <br></br>
             <br></br>
             <img src={poster} alt={altText}></img>
