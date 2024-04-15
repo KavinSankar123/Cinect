@@ -13,17 +13,25 @@ function App() {
   const [minYear, setMinYear] = useState("");
   const [maxYear, setMaxYear] = useState("");
 
-  function addUser(user) {
+  async function addUser(user) {
     if (user === "") return;
     let validUrl;
-    fetch("/verifyUser?user=" + user)
-      .then((res) => res.json())
-      .then((data) => {
-        validUrl = data.response;
-        if (!validUrl) return;
-        const newUsers = [...users, user];
-        setUsers(newUsers);
-      }, []);
+    console.log("fetching");
+    let response = await fetch(
+      "https://cinect-api-run-6bhdfkg7yq-ul.a.run.app/verifyUser?user=" + user,
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
+    console.log(response);
+    let json = await response.json();
+    validUrl = json.response;
+    if (!validUrl) return;
+    const newUsers = [...users, user];
+    setUsers(newUsers);
   }
 
   function addGenre(genre) {
@@ -48,7 +56,7 @@ function App() {
     setMaxYear(newMax);
   }
 
-  function getRecommendation() {
+  async function getRecommendation() {
     const dict = {
       users: users,
       genres: genres,
@@ -56,7 +64,20 @@ function App() {
       end_year: maxYear,
     };
     console.log(JSON.stringify(dict));
-    fetch("/getRecommendation?data=" + JSON.stringify(dict))
+    let response = await fetch(
+      "https://cinect-api-run-6bhdfkg7yq-ul.a.run.app/getRecommendation?data=" + JSON.stringify(dict),
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
+    console.log(response);
+    let json = await response.json();
+    const recommendations = json.response;
+    const bestRec = recommendations[0];
+    fetch(`https://www.omdbapi.com/?t=${bestRec}&apikey=f9a2d5c8`)
       .then((res) => res.json())
       .then((data) => {
         const recommendations = data.response;
