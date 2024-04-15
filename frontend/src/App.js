@@ -3,49 +3,15 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Filters from "./Filters.js";
 import Recommendations from "./Recommendations.js";
 import { Box } from "@mui/material";
-import { getDominantColor } from "./dominantColor";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#996515", // gold color for buttons
-    },
-    text: {
-      primary: "#ffffff", // white text
-      secondary: "#ffffff",
-    },
-    background: {
-      default: "#000000", // default background
-      paper: "rgba(0, 0, 0, 0.2)", // box backgrounds with 20% opacity
-    },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          input: {
-            color: "#ffffff", // text fields default to white
-          },
-          "& label.Mui-focused": {
-            color: "#ffffff", // label color when the text field is focused
-          },
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: "#ffffff", // border color when the text field is not focused
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: "#996515", // border color when the text field is focused
-            },
-          },
-        },
-      },
-    },
-  },
-});
 
 function App() {
-  const [recommendations, setRecommendations] = useState([]);
   const [recommendation, setRecommendation] = useState("");
+  const [currentPlotSummary, setPlotSummary] = useState("");
+  const [rating, setRating] = useState("");
+  const [year, setYear] = useState("");
+  const [genre, setGenre] = useState("");
+  const [actors, setActors] = useState("");
+  const [directors, setDirectors] = useState("");
   const [users, setUsers] = useState([]);
   const [poster, setPoster] = useState("");
   const [genres, setGenres] = useState([]);
@@ -53,17 +19,25 @@ function App() {
   const [maxYear, setMaxYear] = useState("");
   const canvasRef = useRef(null);
 
-  function addUser(user) {
+  async function addUser(user) {
     if (user === "") return;
     let validUrl;
-    fetch("/verifyUser?user=" + user)
-      .then((res) => res.json())
-      .then((data) => {
-        validUrl = data.response;
-        if (!validUrl) return;
-        const newUsers = [...users, user];
-        setUsers(newUsers);
-      }, []);
+    console.log("fetching");
+    let response = await fetch(
+      "https://dynamic-tolerant-boa.ngrok-free.app/verifyUser?user=" + user,
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
+    console.log(response);
+    let json = await response.json();
+    validUrl = json.response;
+    if (!validUrl) return;
+    const newUsers = [...users, user];
+    setUsers(newUsers);
   }
 
   function addGenre(genre) {
@@ -88,7 +62,7 @@ function App() {
     setMaxYear(newMax);
   }
 
-  function getRecommendation() {
+  async function getRecommendation() {
     const dict = {
       users: users,
       genres: genres,
@@ -96,28 +70,42 @@ function App() {
       end_year: maxYear,
     };
     console.log(JSON.stringify(dict));
-    fetch("/getRecommendation?data=" + JSON.stringify(dict))
+    let response = await fetch(
+      "https://dynamic-tolerant-boa.ngrok-free.app/getRecommendation?data=" +
+        JSON.stringify(dict),
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
+    console.log(response);
+    let json = await response.json();
+    const recommendations = json.response;
+    const bestRec = recommendations[0];
+    console.log(bestRec)
+    let cleanName = bestRec.replace(/\s+\(\d{4}\)/, "");
+    
+    fetch(`https://www.omdbapi.com/?t=${cleanName}&apikey=f9a2d5c8`)
       .then((res) => res.json())
       .then((data) => {
-        const recommendations = data.response;
-        const bestRec = recommendations[0];
-        fetch(`https://www.omdbapi.com/?t=${bestRec}&apikey=f9a2d5c8`)
-          .then((res) => res.json())
-          .then((data) => {
-            const newPoster = data["Poster"];
-            console.log(newPoster);
-            setRecommendation(bestRec);
-            setRecommendations(recommendations);
-            setPoster(newPoster);
-          }, []);
+        const newPoster = data["Poster"];
+        setRecommendation(cleanName);
+        setPoster(newPoster);
+        setPlotSummary(data["Plot"])
+        setActors(data["Actors"])
+        setDirectors(data["Director"])
+        setYear(data["Year"])
+        setRating(data["imdbRating"])
+        setGenre(data["Genre"])
       }, []);
   }
-
-  const [theme, setTheme] = useState(
+  const [theme] = useState(
     createTheme({
       palette: {
         primary: {
-          main: "#996515",
+          main: "#17202A",
         },
         text: {
           primary: "#ffffff",
@@ -125,59 +113,27 @@ function App() {
         },
         background: {
           default: "#000000",
-          paper: "rgba(0, 0, 0, 0.2)",
+          paper: "rgba(0, 0, 0, 0.4)",
         },
       },
     })
   );
+const imageURLs = [
+  "https://images8.alphacoders.com/131/1314205.jpeg",
+  "https://images3.alphacoders.com/135/1358834.jpeg",
+  "https://wallpapercave.com/wp/wp5435898.jpg"
+];
 
+// Function to select a random image URL from the array
+const getRandomImageUrl = () => {
+  const randomIndex = Math.floor(Math.random() * imageURLs.length);
+  return imageURLs[randomIndex];
+};
   useEffect(() => {
     if (poster) {
       setBgImage(`url(${poster})`);
-      getDominantColor(canvasRef.current, poster, (color) => {
-        setTheme(
-          createTheme({
-            palette: {
-              primary: {
-                main: color,
-              },
-              text: {
-                primary: "#ffffff",
-                secondary: "#ffffff",
-              },
-              background: {
-                default: "#000000",
-                paper: "rgba(0, 0, 0, 0.2)",
-              },
-            },
-          })
-        );
-      });
     } else {
-      setBgImage(`url(https://images8.alphacoders.com/131/1314205.jpeg)`);
-      getDominantColor(
-        canvasRef.current,
-        "url(https://images8.alphacoders.com/131/1314205.jpeg)",
-        (color) => {
-          setTheme(
-            createTheme({
-              palette: {
-                primary: {
-                  main: color,
-                },
-                text: {
-                  primary: "#ffffff",
-                  secondary: "#ffffff",
-                },
-                background: {
-                  default: "#000000",
-                  paper: "rgba(0, 0, 0, 0.2)",
-                },
-              },
-            })
-          );
-        }
-      );
+      setBgImage(`url(${getRandomImageUrl()})`);
     }
   }, [poster]);
   const [bgImage, setBgImage] = useState("");
@@ -202,13 +158,20 @@ function App() {
           transition: "background-image 0.3s", // Smooth transition for background image change
         }}
       >
-        {/* Only one Box for recommendations needed */}
         <Recommendations
-          getRecommendation={getRecommendation}
           recommendation={recommendation}
+          getRecommendation={getRecommendation}
           poster={poster}
+          selectedUsers={users}
+          selectedGenres={genres}
+          yearRange={[minYear, maxYear]}
+          plotSummary={currentPlotSummary}
+          actors={actors}
+          directors={directors}
+          genre={genre}
+          rating={rating}
+          year={rating}
         />
-        {/* Filters at the bottom */}
         <Box sx={{ position: "absolute", bottom: 0, width: "100%" }}>
           <Filters
             users={users}

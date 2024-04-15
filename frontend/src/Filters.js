@@ -1,23 +1,15 @@
-import React, { useState } from 'react';
-import { Typography, Slider, Box, Button, Grid, TextField } from '@mui/material';
-
-// Helper function to format value label on the slider
-const valueLabelFormat = (value) => `${value}`;
-
-// InputField sub-component using Material-UI TextField
-const InputField = ({ value, onChange, placeholder }) => (
-  <TextField
-    variant="outlined"
-    placeholder={placeholder}
-    value={value}
-    onChange={(e) => onChange(e.target.value)}
-    size="small"
-    fullWidth
-    InputProps={{
-      style: { color: 'white' },  // Make font color white
-    }}
-  />
-);
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
+  Container,
+} from "@mui/material";
 
 // UserFilter sub-component using Material-UI
 const UserFilter = ({ addUser }) => {
@@ -29,7 +21,8 @@ const UserFilter = ({ addUser }) => {
   };
 
   return (
-    <Box sx={{ mb: 2 }}> {/* Add bottom margin for spacing */}
+    <Box sx={{ mb: 2 }}>
+      {" "}
       <TextField
         variant="outlined"
         label="Add User"
@@ -39,7 +32,26 @@ const UserFilter = ({ addUser }) => {
         fullWidth
         size="small"
         InputProps={{
-          style: { color: 'white' },  // Make font color white
+          style: { color: "white" }, // Make font color white
+        }}
+        InputLabelProps={{
+          style: { color: "white" }, // Make label text color white
+        }}
+        sx={{
+          "& label.Mui-focused": {
+            color: "white", // Label color when input is focused
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "white", // Border color
+            },
+            "&:hover fieldset": {
+              borderColor: "white", // Border color when hovered
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "white", // Border color when input is focused
+            },
+          },
         }}
       />
       <Button
@@ -47,7 +59,7 @@ const UserFilter = ({ addUser }) => {
         color="primary"
         onClick={handleAddUser}
         fullWidth
-        sx={{ mt: 1, height: '40px' }}  // Consistent margin-top and height
+        sx={{ mt: 1, height: "40px" }} // Consistent margin-top and height
       >
         Add User
       </Button>
@@ -62,26 +74,57 @@ const GenreFilter = ({ addGenre }) => {
     addGenre(genreInput);
     setGenreInput("");
   };
+  const options = [
+    "Action",
+    "Adventure",
+    "Animation",
+    "Children",
+    "Comedy",
+    "Crime",
+    "Documentary",
+    "Drama",
+    "Fantasy",
+    "Film-Noir",
+    "Horror",
+    "Musical",
+    "Mystery",
+    "Romance",
+    "Sci-Fi",
+    "Thriller",
+    "War",
+    "Western",
+  ];
 
   return (
-    <Box sx={{ mb: 2 }}> {/* Add bottom margin for spacing */}
-      <TextField
-        variant="outlined"
-        label="Add Genre"
-        value={genreInput}
-        onChange={(e) => setGenreInput(e.target.value)}
-        fullWidth
-        size="small"
-        InputProps={{
-          style: { color: 'white' },  // Make font color white
-        }}
-      />
+    <Box sx={{ mb: 2 }}>
+      {" "}
+      {/* Add bottom margin for spacing */}
+      <FormControl fullWidth size="small">
+        <InputLabel id="genre-select-label">Add Genre</InputLabel>
+        <Select
+          labelId="genre-select-label"
+          id="genre-select"
+          value={genreInput}
+          label="Add Genre"
+          onChange={(e) => setGenreInput(e.target.value)}
+          sx={{
+            ".MuiSelect-select": { color: "white" }, // Select input text color
+            ".MuiOutlinedInput-notchedOutline": { borderColor: "white" }, // Border color
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <Button
         variant="contained"
         color="primary"
         onClick={handleAddGenre}
         fullWidth
-        sx={{ mt: 1, height: '40px' }}  // Consistent margin-top and height
+        sx={{ mt: 1, height: "40px" }} // Consistent margin-top and height
       >
         Add Genre
       </Button>
@@ -89,62 +132,21 @@ const GenreFilter = ({ addGenre }) => {
   );
 };
 
-const YearFilter = ({ addMinYear, addMaxYear }) => {
-  const [yearRange, setYearRange] = useState([1880, 2024]);
-
-  const handleChange = (event, newValue) => {
-    setYearRange(newValue);
-  };
-
-  const applyYearFilter = () => {
-    addMinYear(yearRange[0]);
-    addMaxYear(yearRange[1]);
-  };
-
-  return (
-    <Box sx={{ width: '100%', mt: 2 }}>
-      <Typography gutterBottom>Start Year: {yearRange[0]}</Typography>
-      <Typography gutterBottom style={{ textAlign: 'right' }}>
-        End Year: {yearRange[1]}
-      </Typography>
-      <Slider
-        value={yearRange}
-        onChange={handleChange}
-        valueLabelDisplay="auto"
-        aria-labelledby="range-slider"
-        getAriaValueText={valueLabelFormat}
-        min={1880}
-        max={2020}
-        marks
-        sx={{ color: 'gold' }}  // Slider color
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={applyYearFilter}
-        fullWidth
-        sx={{ mt: 1, height: '40px' }}  // Consistent margin-top and height
-      >
-        Apply Year Filter
-      </Button>
-    </Box>
-  );
-};
-
 // Main Filters component using Material-UI Grid
-function Filters({ addUser, addGenre, addMinYear, addMaxYear }) {
+function Filters({ addUser, addGenre }) {
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={4}>
-        <UserFilter addUser={addUser} />
+    <Container maxWidth="md" sx={{ mt: 2, mb: 2, paddingX: 2 }}>
+      {" "}
+      {/* Add horizontal padding */}
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={12} md={6}>
+          <UserFilter addUser={addUser} />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <GenreFilter addGenre={addGenre} />
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={4}>
-        <GenreFilter addGenre={addGenre} />
-      </Grid>
-      <Grid item xs={12} sm={4}>
-        <YearFilter addMinYear={addMinYear} addMaxYear={addMaxYear} />
-      </Grid>
-    </Grid>
+    </Container>
   );
 }
 
