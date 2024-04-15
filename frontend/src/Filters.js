@@ -1,75 +1,151 @@
 import React, { useState } from 'react';
-//import Slider from 'react-slider';
-//import './yearStyles.css'; // Import your CSS file
+import { Typography, Slider, Box, Button, Grid, TextField } from '@mui/material';
 
+// Helper function to format value label on the slider
+const valueLabelFormat = (value) => `${value}`;
 
-function Filters({ users, addUser, genres, addGenre, removeGenre, addMinYear, addMaxYear}) {
-    //USERS
-    const [user, setUser] = useState(""); // State to store the input value
-    const [isOpen, setIsOpen] = useState(false);
-    const [minYear, setMinYear] = useState("");
-    const [maxYear, setMaxYear] = useState("");
+// InputField sub-component using Material-UI TextField
+const InputField = ({ value, onChange, placeholder }) => (
+  <TextField
+    variant="outlined"
+    placeholder={placeholder}
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    size="small"
+    fullWidth
+    InputProps={{
+      style: { color: 'white' },  // Make font color white
+    }}
+  />
+);
 
-    const handleInputChange = (event) => {
-        setUser(event.target.value); // Update the state with the input value
-    };
+// UserFilter sub-component using Material-UI
+const UserFilter = ({ addUser }) => {
+  const [userInput, setUserInput] = useState("");
 
-    const handleAddUser = () => {
-        addUser(user); // Call the addUser function with the input value
-        setUser(""); // Clear the input field after adding the user
-    };
+  const handleAddUser = () => {
+    addUser(userInput);
+    setUserInput("");
+  };
 
-    const userList = users.map((user, num) => <li key={num}>{user}</li>);
+  return (
+    <Box sx={{ mb: 2 }}> {/* Add bottom margin for spacing */}
+      <TextField
+        variant="outlined"
+        label="Add User"
+        value={userInput}
+        onChange={(e) => setUserInput(e.target.value)}
+        placeholder="Add User"
+        fullWidth
+        size="small"
+        InputProps={{
+          style: { color: 'white' },  // Make font color white
+        }}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddUser}
+        fullWidth
+        sx={{ mt: 1, height: '40px' }}  // Consistent margin-top and height
+      >
+        Add User
+      </Button>
+    </Box>
+  );
+};
 
+const GenreFilter = ({ addGenre }) => {
+  const [genreInput, setGenreInput] = useState("");
 
-    const options = [
-    'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 
-    'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
-    'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War',  'Western'
-    ];
+  const handleAddGenre = () => {
+    addGenre(genreInput);
+    setGenreInput("");
+  };
 
-    return (
-        <div>
-            <h1>Cinect</h1>
-            <p>Generate group movie recommendations using Letterboxd data, streaming service preference, and other filters!</p>
-            <ol>{userList}</ol>
-            <p> Add Users by Letterboxd username. </p>
-            <input type="text" value={user} onChange={handleInputChange} />
-            <button onClick={handleAddUser}>Add User</button>
-            <br></br>
-            <br></br>
-            
-            <button onClick={() => setIsOpen(!isOpen)} className="dropbtn">Select genres</button>
-                {isOpen && (
-                    <div className="dropdown-content">
-                        {options.map((option, index) => (
-                        <div key={index}>
-                            <label className="dropdown-item">
-                            <input
-                                type="checkbox"
-                                checked={genres.includes(option)}
-                                onChange={() => genres.includes(option) ? removeGenre(option) : addGenre(option)}
-                            />
-                            {option}
-                            </label>
-                        </div>
-                    ))}
-                
-                    </div>  
-                    
-                )}
+  return (
+    <Box sx={{ mb: 2 }}> {/* Add bottom margin for spacing */}
+      <TextField
+        variant="outlined"
+        label="Add Genre"
+        value={genreInput}
+        onChange={(e) => setGenreInput(e.target.value)}
+        fullWidth
+        size="small"
+        InputProps={{
+          style: { color: 'white' },  // Make font color white
+        }}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddGenre}
+        fullWidth
+        sx={{ mt: 1, height: '40px' }}  // Consistent margin-top and height
+      >
+        Add Genre
+      </Button>
+    </Box>
+  );
+};
 
+const YearFilter = ({ addMinYear, addMaxYear }) => {
+  const [yearRange, setYearRange] = useState([1880, 2024]);
 
-            <h2>Enter a Range of Years</h2>
-                <p>Provide a date range for your recommended movie .</p>
-                <label>Released After: </label><input type="text" value={minYear} onChange={(newValues) => setMinYear(newValues.target.value)} />
-                <button onClick={() => addMinYear(minYear)}>Add lower bound</button>
-                <br></br>
-                <label>Released Before: </label><input type="text" value={maxYear} onChange={(newValues) => setMaxYear(newValues.target.value)} />
-                <button onClick={() => addMaxYear(maxYear)}>Add Upper bound</button>
-                
-        </div>
-    );
+  const handleChange = (event, newValue) => {
+    setYearRange(newValue);
+  };
+
+  const applyYearFilter = () => {
+    addMinYear(yearRange[0]);
+    addMaxYear(yearRange[1]);
+  };
+
+  return (
+    <Box sx={{ width: '100%', mt: 2 }}>
+      <Typography gutterBottom>Start Year: {yearRange[0]}</Typography>
+      <Typography gutterBottom style={{ textAlign: 'right' }}>
+        End Year: {yearRange[1]}
+      </Typography>
+      <Slider
+        value={yearRange}
+        onChange={handleChange}
+        valueLabelDisplay="auto"
+        aria-labelledby="range-slider"
+        getAriaValueText={valueLabelFormat}
+        min={1880}
+        max={2020}
+        marks
+        sx={{ color: 'gold' }}  // Slider color
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={applyYearFilter}
+        fullWidth
+        sx={{ mt: 1, height: '40px' }}  // Consistent margin-top and height
+      >
+        Apply Year Filter
+      </Button>
+    </Box>
+  );
+};
+
+// Main Filters component using Material-UI Grid
+function Filters({ addUser, addGenre, addMinYear, addMaxYear }) {
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={4}>
+        <UserFilter addUser={addUser} />
+      </Grid>
+      <Grid item xs={12} sm={4}>
+        <GenreFilter addGenre={addGenre} />
+      </Grid>
+      <Grid item xs={12} sm={4}>
+        <YearFilter addMinYear={addMinYear} addMaxYear={addMaxYear} />
+      </Grid>
+    </Grid>
+  );
 }
 
 export default Filters;
