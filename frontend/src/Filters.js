@@ -31,21 +31,34 @@ function Filters({ users, addUser, genres, addGenre, removeGenre, addMinYear, ad
     return (
         <div>
             <h1>Cinect</h1>
-            <p>Generate group movie recommendations using Letterboxd data, streaming service preference, and other filters!</p>
+            <p>Generate group movie recommendations using Letterboxd data!</p>
             <ol>{userList}</ol>
             <p> Add Users by Letterboxd username. </p>
             <input type="text" value={user} onChange={handleInputChange} />
-            <button onClick={handleAddUser}>Add User</button>
-            <br></br>
+            <button class="button-31" onClick={handleAddUser}>Add User</button>
             <br></br>
             
-            <button onClick={() => setIsOpen(!isOpen)} className="dropbtn">Select genres</button>
+            <h2>Enter a Range of Years</h2>
+                <p>Provide a date range for your recommended movie .</p>
+                <label>Released After: </label><input type="text" value={minYear} onChange={(newValues) => setMinYear(newValues.target.value)} />
+                <button class="button-31" onClick={() => addMinYear(minYear)}>Add Lower Bound</button>
+                <br></br>
+                <label>Released Before: </label><input type="text" value={maxYear} onChange={(newValues) => setMaxYear(newValues.target.value)} />
+                <button class="button-31" onClick={() => addMaxYear(maxYear)}>Add Upper Bound</button>
+
+            <br></br>
+            <br></br>
+    
+            <button class="button-31" onClick={() => setIsOpen(!isOpen)} >Select genres</button>
+            <br></br>
+            <br></br>
                 {isOpen && (
-                    <div className="dropdown-content">
+                    <div id="dropdown-content">
                         {options.map((option, index) => (
                         <div key={index}>
                             <label className="dropdown-item">
                             <input
+                                class="checkbox"
                                 type="checkbox"
                                 checked={genres.includes(option)}
                                 onChange={() => genres.includes(option) ? removeGenre(option) : addGenre(option)}
@@ -58,16 +71,8 @@ function Filters({ users, addUser, genres, addGenre, removeGenre, addMinYear, ad
                     </div>  
                     
                 )}
-
-
-            <h2>Enter a Range of Years</h2>
-                <p>Provide a date range for your recommended movie .</p>
-                <label>Released After: </label><input type="text" value={minYear} onChange={(newValues) => setMinYear(newValues.target.value)} />
-                <button onClick={() => addMinYear(minYear)}>Add lower bound</button>
                 <br></br>
-                <label>Released Before: </label><input type="text" value={maxYear} onChange={(newValues) => setMaxYear(newValues.target.value)} />
-                <button onClick={() => addMaxYear(maxYear)}>Add Upper bound</button>
-                
+                <br></br>
         </div>
     );
 }
