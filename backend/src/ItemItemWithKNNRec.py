@@ -8,7 +8,8 @@ from os import environ
 from fuzzywuzzy import fuzz
 from google.cloud import firestore
 from google.oauth2 import service_account
-
+from google.auth.credentials import AnonymousCredentials
+import json
 
 class ItemItemWithKNNRec:
     def __init__(self):
@@ -25,8 +26,7 @@ class ItemItemWithKNNRec:
         self.saved_kNN = joblib.load("src/kNN_model.joblib")
 
     def fetch_movie_info(self):
-        key_file_path = os.getcwd() + '/src/cinectmoviedb-665d236ba447.json'
-        print(key_file_path)
+        key_file_path = os.getcwd() + '/src/credentials.json'
         environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
         project = 'cinectmoviedb'
         client = firestore.Client(project=project, database='cinectdatabase')
