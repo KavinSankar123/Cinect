@@ -32,6 +32,7 @@ class ItemItemWithKNNRec:
         # project = 'cinectmoviedb'
         # client = firestore.Client(project=project, database='cinectdatabase')
         json_str = json.loads(environ['CREDENTIALS'])
+        print(json_str)
         client = firestore.Client.from_service_account_info(json_str, database='cinectdatabase')
 
         collection_ref = client.collection('movie_info')
