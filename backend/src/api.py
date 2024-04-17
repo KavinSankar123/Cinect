@@ -8,6 +8,8 @@ from ItemItemWithKNNRec import ItemItemWithKNNRec
 from scraper import extract_titles
 from scraper import is_valid_url
 
+from flask_cors import cross_origin
+
 app = Flask(__name__)
 
 # verify whether a username is valid

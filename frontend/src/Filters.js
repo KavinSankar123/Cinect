@@ -1,75 +1,153 @@
-import React, { useState } from 'react';
-//import Slider from 'react-slider';
-//import './yearStyles.css'; // Import your CSS file
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
+  Container,
+} from "@mui/material";
 
+// UserFilter sub-component using Material-UI
+const UserFilter = ({ addUser }) => {
+  const [userInput, setUserInput] = useState("");
 
-function Filters({ users, addUser, genres, addGenre, removeGenre, addMinYear, addMaxYear}) {
-    //USERS
-    const [user, setUser] = useState(""); // State to store the input value
-    const [isOpen, setIsOpen] = useState(false);
-    const [minYear, setMinYear] = useState("");
-    const [maxYear, setMaxYear] = useState("");
+  const handleAddUser = () => {
+    addUser(userInput);
+    setUserInput("");
+  };
 
-    const handleInputChange = (event) => {
-        setUser(event.target.value); // Update the state with the input value
-    };
+  return (
+    <Box sx={{ mb: 2 }}>
+      {" "}
+      <TextField
+        variant="outlined"
+        label="Add User"
+        value={userInput}
+        onChange={(e) => setUserInput(e.target.value)}
+        placeholder="Add User"
+        fullWidth
+        size="small"
+        InputProps={{
+          style: { color: "white" }, // Make font color white
+        }}
+        InputLabelProps={{
+          style: { color: "white" }, // Make label text color white
+        }}
+        sx={{
+          "& label.Mui-focused": {
+            color: "white", // Label color when input is focused
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "white", // Border color
+            },
+            "&:hover fieldset": {
+              borderColor: "white", // Border color when hovered
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "white", // Border color when input is focused
+            },
+          },
+        }}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddUser}
+        fullWidth
+        sx={{ mt: 1, height: "40px" }} // Consistent margin-top and height
+      >
+        Add User
+      </Button>
+    </Box>
+  );
+};
 
-    const handleAddUser = () => {
-        addUser(user); // Call the addUser function with the input value
-        setUser(""); // Clear the input field after adding the user
-    };
+const GenreFilter = ({ addGenre }) => {
+  const [genreInput, setGenreInput] = useState("");
 
-    const userList = users.map((user, num) => <li key={num}>{user}</li>);
+  const handleAddGenre = () => {
+    addGenre(genreInput);
+    setGenreInput("");
+  };
+  const options = [
+    "Action",
+    "Adventure",
+    "Animation",
+    "Children",
+    "Comedy",
+    "Crime",
+    "Documentary",
+    "Drama",
+    "Fantasy",
+    "Film-Noir",
+    "Horror",
+    "Musical",
+    "Mystery",
+    "Romance",
+    "Sci-Fi",
+    "Thriller",
+    "War",
+    "Western",
+  ];
 
+  return (
+    <Box sx={{ mb: 2 }}>
+      {" "}
+      {/* Add bottom margin for spacing */}
+      <FormControl fullWidth size="small">
+        <InputLabel id="genre-select-label">Add Genre</InputLabel>
+        <Select
+          labelId="genre-select-label"
+          id="genre-select"
+          value={genreInput}
+          label="Add Genre"
+          onChange={(e) => setGenreInput(e.target.value)}
+          sx={{
+            ".MuiSelect-select": { color: "white" }, // Select input text color
+            ".MuiOutlinedInput-notchedOutline": { borderColor: "white" }, // Border color
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddGenre}
+        fullWidth
+        sx={{ mt: 1, height: "40px" }} // Consistent margin-top and height
+      >
+        Add Genre
+      </Button>
+    </Box>
+  );
+};
 
-    const options = [
-    'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 
-    'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
-    'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War',  'Western'
-    ];
-
-    return (
-        <div>
-            <h1>Cinect</h1>
-            <p>Generate group movie recommendations using Letterboxd data, streaming service preference, and other filters!</p>
-            <ol>{userList}</ol>
-            <p> Add Users by Letterboxd username. </p>
-            <input type="text" value={user} onChange={handleInputChange} />
-            <button onClick={handleAddUser}>Add User</button>
-            <br></br>
-            <br></br>
-            
-            <button onClick={() => setIsOpen(!isOpen)} className="dropbtn">Select genres</button>
-                {isOpen && (
-                    <div className="dropdown-content">
-                        {options.map((option, index) => (
-                        <div key={index}>
-                            <label className="dropdown-item">
-                            <input
-                                type="checkbox"
-                                checked={genres.includes(option)}
-                                onChange={() => genres.includes(option) ? removeGenre(option) : addGenre(option)}
-                            />
-                            {option}
-                            </label>
-                        </div>
-                    ))}
-                
-                    </div>  
-                    
-                )}
-
-
-            <h2>Enter a Range of Years</h2>
-                <p>Provide a date range for your recommended movie .</p>
-                <label>Released After: </label><input type="text" value={minYear} onChange={(newValues) => setMinYear(newValues.target.value)} />
-                <button onClick={() => addMinYear(minYear)}>Add lower bound</button>
-                <br></br>
-                <label>Released Before: </label><input type="text" value={maxYear} onChange={(newValues) => setMaxYear(newValues.target.value)} />
-                <button onClick={() => addMaxYear(maxYear)}>Add Upper bound</button>
-                
-        </div>
-    );
+// Main Filters component using Material-UI Grid
+function Filters({ addUser, addGenre }) {
+  return (
+    <Container maxWidth="md" sx={{ mt: 2, mb: 2, paddingX: 2 }}>
+      {" "}
+      {/* Add horizontal padding */}
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={12} md={6}>
+          <UserFilter addUser={addUser} />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <GenreFilter addGenre={addGenre} />
+        </Grid>
+      </Grid>
+    </Container>
+  );
 }
 
 export default Filters;
