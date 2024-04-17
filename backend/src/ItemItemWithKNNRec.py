@@ -26,14 +26,10 @@ class ItemItemWithKNNRec:
         self.saved_kNN = joblib.load("src/kNN_model.joblib")
 
     def fetch_movie_info(self):
-        # key_file_path = os.getcwd() + '/src/cinectmoviedb-665d236ba447.json'
-        # print(key_file_path)
-        # environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
-        # project = 'cinectmoviedb'
-        # client = firestore.Client(project=project, database='cinectdatabase')
-        json_str = json.loads(environ['CREDENTIALS'])
-        print(json_str)
-        client = firestore.Client.from_service_account_info(json_str, database='cinectdatabase')
+        key_file_path = os.getcwd() + '/src/credentials.json'
+        environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
+        project = 'cinectmoviedb'
+        client = firestore.Client(project=project, database='cinectdatabase')
 
         collection_ref = client.collection('movie_info')
         page_size = 50
