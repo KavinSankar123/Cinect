@@ -28,7 +28,6 @@ def verify_user():
 def get_recommendation():
     json_str = str(request.args.get("data"))
     json_obj = json.loads(json_str)
-
     input_movie_list = extract_titles(json_obj["users"])
     genres = json_obj["genres"]
     try:
