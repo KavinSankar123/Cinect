@@ -11,6 +11,13 @@ from scraper import is_valid_url
 from flask_cors import cross_origin
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+@app.route("/")
+@cross_origin()
+def root():
+  return "Connected to backend!"
 
 # verify whether a username is valid
 # /verifyUser?user=<username>

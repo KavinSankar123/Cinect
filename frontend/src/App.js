@@ -27,7 +27,6 @@ function App() {
       "https://cinect-api-run-6bhdfkg7yq-ul.a.run.app/verifyUser?user=" + user,
       {
         headers: {
-          "ngrok-skip-browser-warning": "true",
           "Access-Control-Allow-Origin": "*",
         },
       }
@@ -74,7 +73,6 @@ function App() {
       "https://cinect-api-run-6bhdfkg7yq-ul.a.run.app/getRecommendation?data=" + JSON.stringify(dict),
       {
         headers: {
-          "ngrok-skip-browser-warning": "true",
           "Access-Control-Allow-Origin": "*",
         },
       }
