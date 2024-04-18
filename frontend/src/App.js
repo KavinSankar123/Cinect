@@ -40,6 +40,7 @@ function App() {
   }
 
   function addGenre(genre) {
+    if (genres.includes(genre)) return;
     const newGenre = [...genres, genre];
     setGenres(newGenre);
   }
