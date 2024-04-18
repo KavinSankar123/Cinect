@@ -10,12 +10,9 @@ _domain = 'https://letterboxd.com/'
 
 # return true if the username represents a user on the site
 def is_valid_url(letterboxd_username: str) -> bool:
-    try:
-        list_url = username_to_url(letterboxd_username)
-        page_response = get_page(list_url)
-        return True
-    except:
-        return False
+    list_url = username_to_url(letterboxd_username)
+    page_response = requests.get(list_url)
+    return page_response.ok
 
 
 def scrape_list(letterboxd_username: str) -> list:
@@ -43,7 +40,7 @@ def username_to_url(letterboxd_username: str) -> str:
 
 def get_page(list_url: str) -> BeautifulSoup:
     page_response = requests.get(list_url)
-
+    print(page_response)
     # Check to see page was downloaded correctly
     page_response.raise_for_status()
 
@@ -53,17 +50,7 @@ def get_page(list_url: str) -> BeautifulSoup:
 def scrape_page(page_soup: BeautifulSoup) -> list:
     page_films = []
 
-    # Grab the main film grid
-    table = page_soup.select('ul[class*="poster-list"]')[-1]
-
-    if table is None:
-        return []
-
-    films = table.select('li[class*="poster-container"]')
-    if films == []:
-        return []
-
-    films = table.find_all('li')
+    films = page_soup.find_all('li', {'class': 'poster-container'})
     if not films:
         return []
 
