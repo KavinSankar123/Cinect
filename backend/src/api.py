@@ -11,7 +11,7 @@ from scraper import is_valid_url
 from flask_cors import cross_origin
 
 app = Flask(__name__)
-cors = CORS(app)
+cors = CORS(app, origins=["https://dynamic-tolerant-boa.ngrok-free.app", "https://cinect-run-6bhdfkg7yq-ul.a.run.app"])
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route("/")
