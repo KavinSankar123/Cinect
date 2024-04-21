@@ -34,14 +34,15 @@ def verify_user():
 def get_recommendation():
     json_str = str(request.args.get("data"))
     json_obj = json.loads(json_str)
-    input_movie_list = extract_titles(json_obj["users"])
+    users = json_obj["users"]
+    input_movie_list = extract_titles(users)
     genres = json_obj["genres"]
     try:
         start_end_year = [int(json_obj["start_year"]), int(json_obj["end_year"])]
     except:
         start_end_year = [1824, 2024]
     
-    print(f"Generating recommendation: \nUsers: {json_obj["users"]}\nGenres: {genres}\nYear range: {start_end_year[0]} - {start_end_year[1]}")
+    print(f"Generating recommendation using parameters: \nUsers: {users}\nGenres: {genres}\nYear range: {start_end_year[0]} - {start_end_year[1]}")
     
     item_item_recommender = ItemItemWithKNNRec()
     movie_rec = item_item_recommender.get_group_recommendation(
