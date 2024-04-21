@@ -1,13 +1,10 @@
 import json
-
 from flask import Flask, jsonify
 from flask import request
 from flask_cors import CORS, cross_origin
-
 from ItemItemWithKNNRec import ItemItemWithKNNRec
 from scraper import extract_titles
 from scraper import is_valid_url
-
 from flask_cors import cross_origin
 
 app = Flask(__name__)
@@ -43,15 +40,9 @@ def get_recommendation():
         start_end_year = [int(json_obj["start_year"]), int(json_obj["end_year"])]
     except:
         start_end_year = [1824, 2024]
-
-    print(input_movie_list)
-    print(genres)
-    print(start_end_year)
-
-    # in the backend backend, use the user's top rated movies for the input (rating >= 4.0)
-    # input to recommender will be movie titles from letterbox that is not in correct format
-    # call kavin function
-
+    
+    print(f"Generating recommendation: \nUsers: {json_obj["users"]}\nGenres: {genres}\nYear range: {start_end_year[0]} - {start_end_year[1]}")
+    
     item_item_recommender = ItemItemWithKNNRec()
     movie_rec = item_item_recommender.get_group_recommendation(
         input_movie_list=input_movie_list,

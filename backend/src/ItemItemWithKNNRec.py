@@ -7,9 +7,6 @@ import datetime
 from os import environ
 from fuzzywuzzy import fuzz
 from google.cloud import firestore
-from google.oauth2 import service_account
-from google.auth.credentials import AnonymousCredentials
-import json
 
 class ItemItemWithKNNRec:
     def __init__(self):
@@ -30,7 +27,6 @@ class ItemItemWithKNNRec:
         environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
         project = 'cinectmoviedb'
         client = firestore.Client(project=project, database='cinectdatabase')
-
         collection_ref = client.collection('movie_info')
         page_size = 50
         query = collection_ref.limit(page_size)
@@ -166,28 +162,12 @@ class ItemItemWithKNNRec:
         formatted_titles = self.find_similiar_movie_titles(input_movie_list)
         group_movie_list_ids = self.movie_titles_to_ids(formatted_titles)
 
-        print("Clustering...")
         group_rec = []
         for m_id in group_movie_list_ids:
             output_m_ids = self.find_similar_movies(m_id, self.Q.T, self.movie_mapper, self.movie_inv_mapper)
             m_titles = [self.movie_titles[i] for i in output_m_ids]
             group_rec.append(m_titles)
 
-        print("Filtering movies...")
         group_rec = self.filter_movies(initial_recs=group_rec, genres=desired_genres, start_end_year=start_end_year)
-        print("Ranking movies...")
         group_rec = self.rank_movie_score(group_rec)
         return group_rec
-
-
-# genres = {'Adventure', 'Action'}
-# input_movie_list = ['solo-a-star-wars-story', 'murder-on-the-orient-express-2017', '8-mile', 'avengers-infinity-war', 'kung-fu-panda', 'spider-man-no-way-home', 'toy-story', 'captain-america-civil-war', 'the-dark-knight-rises', 'life-itself-2018', 'coraline', 'the-shining', 'ratatouille', 'the-queens-gambit', 'shang-chi-and-the-legend-of-the-ten-rings', 'blackkklansman', 'spider-man-homecoming', 'train-to-busan', 'ant-man', 'up', 'star-wars-the-last-jedi', 'moonrise-kingdom', 'good-will-hunting', 'nope', 'joker-2019', 'batman-begins', 'the-matrix', 'wonder-2017', 'hidden-figures', 'holes', 'mulan', 'home-alone', 'doctor-strange-2016', 'zootopia', 'inception', 'despicable-me', 'star-wars', 'the-lion-king', 'the-dark-knight', 'the-hunger-games', 'interstellar', 'the-martian', 'quiz-show', 'school-of-rock', 'elf', 'oceans-eleven-2001', 'back-to-the-future-part-ii', 'harry-potter-and-the-goblet-of-fire', 'knives-out-2019', 'la-la-land', 'hamilton-2020', 'jumanji-welcome-to-the-jungle', 'black-panther', 'oceans-eight', 'harry-potter-and-the-chamber-of-secrets', 'harry-potter-and-the-order-of-the-phoenix', 'dont-worry-darling', 'superbad', 'back-to-the-future', 'big-hero-6', 'walle', 'coco-2017', 'lion', 'inside-man', 'rogue-one-a-star-wars-story', 'it-2017', 'were-the-millers', 'tenet', 'the-truman-show', '42']
-# start_end_year = []
-# item_item_recommender = ItemItemWithKNNRec()
-# movie_rec = item_item_recommender.get_group_recommendation(
-#     input_movie_list=input_movie_list,
-#     desired_genres=genres,
-#     start_end_year=start_end_year
-# )
-#
-# print(movie_rec)
