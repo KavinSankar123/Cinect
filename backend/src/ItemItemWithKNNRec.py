@@ -25,9 +25,16 @@ class ItemItemWithKNNRec:
     def fetch_movie_info(self):
         key_file_path = os.getcwd() + '/src/credentials.json'
         environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
-        project = 'cinectmoviedb'
-        client = firestore.Client(project=project, database='cinectdatabase')
-        collection_ref = client.collection('movie_info')
+
+        # project = 'cinectmoviedb'
+        project = 'cinectapp'
+
+        # client = firestore.Client(project=project, database='cinectdatabase')
+        client = firestore.Client(project=project, database='moviedb')
+
+        # collection_ref = client.collection('movie_info')
+        collection_ref = client.collection('movieInfo')
+
         page_size = 50
         query = collection_ref.limit(page_size)
         all_documents = []
