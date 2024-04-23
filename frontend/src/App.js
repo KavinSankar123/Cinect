@@ -128,12 +128,6 @@ function App() {
     setCurrentRecIndex(0);
 
     const recommendations = json.response;
-
-    if (recommendation.length === 0) {
-      console.log("Empty list!");
-      setRecommendation("No movie found!");
-      return;
-    }
     const bestRec = recommendations[0];
     console.log(bestRec);
     let cleanName = bestRec.replace(/\s+\(\d{4}\)/, "");
