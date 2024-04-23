@@ -19,3 +19,11 @@ Cinect is a movie recommendation service, eliminating the pressure of choosing a
 - **Frontend** - ReactJS
 - **Google Cloud** - Cloud Run, Cloud Storage, Firebase
 
+## Website Demo
+
+
+![demo](input.gif)
+
+### Result
+
+![output](output.png)
