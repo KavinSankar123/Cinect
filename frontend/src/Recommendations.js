@@ -60,9 +60,6 @@ function Recommendations({
   minYear,
   maxYear
 }) {
-  const altText =
-    poster === "N/A" || poster == null ? "Poster for movie not found" : "";
-
   const [loading, setLoading] = useState(false); // State to track loading status
 
   const handleGetRecommendation = async () => {
@@ -70,8 +67,6 @@ function Recommendations({
     await getRecommendation(); // Assume getRecommendation is an async function
     setLoading(false); // End loading
   };
-  const [yearRange, setYearRange] = useState([1950, 2024]);
-
   return (
     <Box sx={{ maxWidth: 850, width: "100%" }}>
       <Box
@@ -161,7 +156,7 @@ function Recommendations({
             variant="contained"
             onClick={handleGetRecommendation}
             fullWidth
-            disabled={loading} // Disable the button when loading
+            disabled={loading || selectedUsers.length === 0} // Disable the button when loading
           >
             {loading ? <CircularProgress size={24} /> : "Get Recommendation"}
           </Button>
