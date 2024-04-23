@@ -65,6 +65,8 @@ class ItemItemWithKNNRec:
         X = X.T
         neighbour_ids = []
 
+        if movie_id not in movie_mapper:
+            return []
         movie_ind = movie_mapper[movie_id]
         movie_vec = X[movie_ind]
         if isinstance(movie_vec, np.ndarray):
@@ -172,6 +174,10 @@ class ItemItemWithKNNRec:
         group_rec = []
         for m_id in group_movie_list_ids:
             output_m_ids = self.find_similar_movies(m_id, self.Q.T, self.movie_mapper, self.movie_inv_mapper)
+
+            if not output_m_ids:
+                continue
+
             m_titles = [self.movie_titles[i] for i in output_m_ids]
             group_rec.append(m_titles)
 
