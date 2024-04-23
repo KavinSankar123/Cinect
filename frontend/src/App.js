@@ -15,9 +15,37 @@ function App() {
   const [users, setUsers] = useState([]);
   const [poster, setPoster] = useState("");
   const [genres, setGenres] = useState([]);
-  const [minYear, setMinYear] = useState(1874);
+  const [minYear, setMinYear] = useState(1950);
   const [maxYear, setMaxYear] = useState(2024);
+  const [recommendations, setRecommendations] = useState([]);
+  const [currentRecIndex, setCurrentRecIndex] = useState(0);
   const canvasRef = useRef(null);
+
+  function handleNextRecommendation() {
+    setCurrentRecIndex((prevIndex) => {
+      const nextIndex = prevIndex + 1;
+
+      const bestRec = recommendations[nextIndex];
+      console.log(bestRec);
+      let cleanName = bestRec.replace(/\s+\(\d{4}\)/, "");
+
+      fetch(`https://www.omdbapi.com/?t=${cleanName}&apikey=f9a2d5c8`)
+        .then((res) => res.json())
+        .then((data) => {
+          const newPoster = data["Poster"];
+          setRecommendation(cleanName);
+          setPoster(newPoster);
+          setPlotSummary(data["Plot"]);
+          setActors(data["Actors"]);
+          setDirectors(data["Director"]);
+          setYear(data["Year"]);
+          setRating(data["imdbRating"]);
+          setGenre(data["Genre"]);
+        }, []);
+
+      return nextIndex < recommendations.length ? nextIndex : 0; // Loop back to the first if end reached
+    });
+  }
 
   async function addUser(user) {
     if (user === "") return;
@@ -41,7 +69,7 @@ function App() {
   }
 
   function addGenre(genre) {
-    if (genres.includes(genre) || genre === '') return;
+    if (genres.includes(genre) || genre === "") return;
     const newGenre = [...genres, genre];
     setGenres(newGenre);
   }
@@ -72,36 +100,54 @@ function App() {
     };
     console.log(JSON.stringify(dict));
     let response = await fetch(
-      "https://cinect-api-run-6bhdfkg7yq-ul.a.run.app/getRecommendation?data=" + JSON.stringify(dict),
+      "https://cinect-api-run-6bhdfkg7yq-ul.a.run.app/getRecommendation?data=" +
+        JSON.stringify(dict),
       {
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
       }
     );
-    console.log(response);
     let json = await response.json();
+    setRecommendations(json.response);
+    setCurrentRecIndex(0);
+
     const recommendations = json.response;
+
+    if (recommendation.length === 0) {
+      console.log("Empty list!");
+      setRecommendation("No movie found!");
+      return;
+    }
     const bestRec = recommendations[0];
-    console.log(bestRec)
+    console.log(bestRec);
     let cleanName = bestRec.replace(/\s+\(\d{4}\)/, "");
-    
+
     fetch(`https://www.omdbapi.com/?t=${cleanName}&apikey=f9a2d5c8`)
       .then((res) => res.json())
       .then((data) => {
         const newPoster = data["Poster"];
         setRecommendation(cleanName);
         setPoster(newPoster);
-        setPlotSummary(data["Plot"])
-        setActors(data["Actors"])
-        setDirectors(data["Director"])
-        setYear(data["Year"])
-        setRating(data["imdbRating"])
-        setGenre(data["Genre"])
+        setPlotSummary(data["Plot"]);
+        setActors(data["Actors"]);
+        setDirectors(data["Director"]);
+        setYear(data["Year"]);
+        setRating(data["imdbRating"]);
+        setGenre(data["Genre"]);
       }, []);
   }
   const [theme] = useState(
     createTheme({
+      components: {
+        MuiCircularProgress: {
+          styleOverrides: {
+            colorPrimary: {
+              color: "#ffffff", // Sets the primary color to white
+            },
+          },
+        },
+      },
       palette: {
         primary: {
           main: "#17202A",
@@ -117,17 +163,17 @@ function App() {
       },
     })
   );
-const imageURLs = [
-  "https://images8.alphacoders.com/131/1314205.jpeg",
-  "https://images3.alphacoders.com/135/1358834.jpeg",
-  "https://wallpapercave.com/wp/wp5435898.jpg"
-];
+  const imageURLs = [
+    "https://images8.alphacoders.com/131/1314205.jpeg",
+    "https://images3.alphacoders.com/135/1358834.jpeg",
+    "https://wallpapercave.com/wp/wp5435898.jpg",
+  ];
 
-// Function to select a random image URL from the array
-const getRandomImageUrl = () => {
-  const randomIndex = Math.floor(Math.random() * imageURLs.length);
-  return imageURLs[randomIndex];
-};
+  // Function to select a random image URL from the array
+  const getRandomImageUrl = () => {
+    const randomIndex = Math.floor(Math.random() * imageURLs.length);
+    return imageURLs[randomIndex];
+  };
   useEffect(() => {
     if (poster) {
       setBgImage(`url(${poster})`);
@@ -158,8 +204,9 @@ const getRandomImageUrl = () => {
         }}
       >
         <Recommendations
-          recommendation={recommendation}
+          recommendation={recommendations[currentRecIndex]}
           getRecommendation={getRecommendation}
+          nextRecommendation={handleNextRecommendation}
           poster={poster}
           selectedUsers={users}
           selectedGenres={genres}
@@ -169,7 +216,11 @@ const getRandomImageUrl = () => {
           directors={directors}
           genre={genre}
           rating={rating}
-          year={year}
+          hasMoreRecommendations={currentRecIndex < recommendations.length - 1}
+          setMinYear={setMinYear}
+          setMaxYear={setMaxYear}
+          minYear={minYear}
+          maxYear={maxYear}
         />
         <Box sx={{ position: "absolute", bottom: 0, width: "100%" }}>
           <Filters
@@ -178,10 +229,6 @@ const getRandomImageUrl = () => {
             genres={genres}
             addGenre={addGenre}
             removeGenre={removeGenre}
-            minYear={minYear}
-            addMinYear={addMinYear}
-            maxYear={maxYear}
-            addMaxYear={addMaxYear}
           />
         </Box>
       </Box>

@@ -12,28 +12,27 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-const YearFilter = ({ yearRange, setYearRange, minYear, maxYear }) => {
+const YearFilter = ({ setMinYear, setMaxYear, minYear, maxYear }) => {
   const handleChange = (event, newValue) => {
-
-  if (Array.isArray(newValue) && newValue.length === 2 && newValue.every(val => typeof val === 'number')) {
-    setYearRange(newValue);
-  } else {
-    console.error("Invalid value for yearRange:", newValue);
-  }
-};
-
+    if (Array.isArray(newValue) && newValue.length === 2 && newValue.every(val => typeof val === 'number')) {
+      setMinYear(newValue[0]);
+      setMaxYear(newValue[1]);
+    } else {
+      console.error("Invalid value for yearRange:", newValue);
+    }
+  };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
       <Box sx={{ width: "100%", mt: 2 }}>
         <Slider
-          value={yearRange}
+          value={[minYear, maxYear]}
           onChange={handleChange}
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
           getAriaValueText={(value) => `${value}`}
-          min={minYear}
-          max={maxYear}
+          min={1950}  // assuming this is the absolute minimum
+          max={2024}  // assuming this is the absolute maximum
           marks
           sx={{ color: "secondary" }} // Slider color
         />
@@ -45,6 +44,7 @@ const YearFilter = ({ yearRange, setYearRange, minYear, maxYear }) => {
 function Recommendations({
   recommendation,
   getRecommendation,
+  nextRecommendation,
   poster,
   selectedUsers,
   selectedGenres,
@@ -53,7 +53,11 @@ function Recommendations({
   directors,
   genre,
   rating,
-  year,
+  hasMoreRecommendations,
+  setMinYear,
+  setMaxYear,
+  minYear,
+  maxYear
 }) {
   const altText =
     poster === "N/A" || poster == null ? "Poster for movie not found" : "";
@@ -141,16 +145,14 @@ function Recommendations({
             </Typography>
           )}
           {/* Year Range */}
-          {yearRange && yearRange.length === 2 && (
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Year Range: {yearRange[0]} - {yearRange[1]}
+              Year Range: {minYear} - {maxYear}
             </Typography>
-          )}
           <YearFilter
-            yearRange={yearRange}
-            setYearRange={setYearRange}
-            minYear={1950}
-            maxYear={2024}
+            setMinYear={setMinYear}
+            setMaxYear={setMaxYear}
+            minYear={minYear}
+            maxYear={maxYear}
           />{" "}
           <Button
             variant="contained"
@@ -160,6 +162,18 @@ function Recommendations({
           >
             {loading ? <CircularProgress size={24} /> : "Get Recommendation"}
           </Button>
+
+          {recommendation && hasMoreRecommendations && (
+            <Button
+              variant="contained"
+              onClick={nextRecommendation}
+              fullWidth
+              sx={{ mt: 2 }}
+              disabled={loading}
+            >
+              Next Recommendation
+            </Button>
+          )}
         </CardContent>
       </Card>
     </Box>
