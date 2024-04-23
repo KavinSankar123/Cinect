@@ -102,18 +102,6 @@ function App() {
     setGenres(newGenres);
   }
 
-  function addMinYear(year) {
-    if (year < 1874 || year > 2019) year = 1874;
-    const newMin = year;
-    setMinYear(newMin);
-  }
-
-  function addMaxYear(year) {
-    if (year < 1874 || year > 2019) year = 2019;
-    const newMax = year;
-    setMaxYear(newMax);
-  }
-
   async function getRecommendation() {
     const dict = {
       users: users,
@@ -185,7 +173,7 @@ function App() {
         },
         background: {
           default: "#000000",
-          paper: "rgba(0, 0, 0, 0.4)",
+          paper: "rgba(0, 0, 0, 0.5)",
         },
       },
     })
