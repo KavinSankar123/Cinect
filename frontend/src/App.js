@@ -4,6 +4,26 @@ import Filters from "./Filters.js";
 import Recommendations from "./Recommendations.js";
 import { Box } from "@mui/material";
 
+  const options = [
+    "Action",
+    "Adventure",
+    "Animation",
+    "Children",
+    "Comedy",
+    "Crime",
+    "Documentary",
+    "Drama",
+    "Fantasy",
+    "Film-Noir",
+    "Horror",
+    "Musical",
+    "Mystery",
+    "Romance",
+    "Sci-Fi",
+    "Thriller",
+    "War",
+    "Western",
+  ];
 function App() {
   const [recommendation, setRecommendation] = useState("");
   const [currentPlotSummary, setPlotSummary] = useState("");
@@ -98,6 +118,10 @@ function App() {
       start_year: minYear,
       end_year: maxYear,
     };
+  
+    if (genres.length === 0) {
+      dict["genres"] = options;
+    }
     console.log(JSON.stringify(dict));
     let response = await fetch(
       "https://cinect-api-run-6bhdfkg7yq-ul.a.run.app/getRecommendation?data=" +
