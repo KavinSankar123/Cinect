@@ -15,8 +15,8 @@ function App() {
   const [users, setUsers] = useState([]);
   const [poster, setPoster] = useState("");
   const [genres, setGenres] = useState([]);
-  const [minYear, setMinYear] = useState("");
-  const [maxYear, setMaxYear] = useState("");
+  const [minYear, setMinYear] = useState(1874);
+  const [maxYear, setMaxYear] = useState(2024);
   const canvasRef = useRef(null);
 
   async function addUser(user) {
@@ -35,12 +35,13 @@ function App() {
     let json = await response.json();
     validUrl = json.response;
     if (!validUrl) return;
+    if (users.includes(user)) return;
     const newUsers = [...users, user];
     setUsers(newUsers);
   }
 
   function addGenre(genre) {
-    if (genres.includes(genre)) return;
+    if (genres.includes(genre) || genre === '') return;
     const newGenre = [...genres, genre];
     setGenres(newGenre);
   }
@@ -168,7 +169,7 @@ const getRandomImageUrl = () => {
           directors={directors}
           genre={genre}
           rating={rating}
-          year={rating}
+          year={year}
         />
         <Box sx={{ position: "absolute", bottom: 0, width: "100%" }}>
           <Filters

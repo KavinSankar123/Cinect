@@ -14,16 +14,14 @@ import {
 
 const YearFilter = ({ yearRange, setYearRange, minYear, maxYear }) => {
   const handleChange = (event, newValue) => {
-    if (
-      Array.isArray(newValue) &&
-      newValue.every((val) => typeof val === "number")
-    ) {
-      setYearRange(newValue); // This directly updates the state managed in the parent component
-      console.log("Updated yearRange:", newValue); // Debug log
-    } else {
-      console.error("Invalid value for yearRange:", newValue); // Error log
-    }
-  };
+
+  if (Array.isArray(newValue) && newValue.length === 2 && newValue.every(val => typeof val === 'number')) {
+    setYearRange(newValue);
+  } else {
+    console.error("Invalid value for yearRange:", newValue);
+  }
+};
+
 
   return (
     <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
