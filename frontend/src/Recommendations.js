@@ -48,6 +48,8 @@ function Recommendations({
   poster,
   selectedUsers,
   selectedGenres,
+  removeUser,
+  removeGenre,
   plotSummary,
   actors,
   directors,
@@ -102,6 +104,7 @@ function Recommendations({
                 key={index}
                 label={user}
                 variant="outlined"
+                onDelete={() => removeUser(user)} // onDelete handler to remove user
                 sx={{ color: "white" }}
               />
             ))}
@@ -115,6 +118,7 @@ function Recommendations({
                 key={index}
                 label={genre}
                 variant="outlined"
+                onDelete={() => removeGenre(genre)} // onDelete handler to remove genre
                 sx={{ color: "white" }}
               />
             ))}

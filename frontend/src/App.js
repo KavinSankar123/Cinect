@@ -41,6 +41,9 @@ function App() {
   const [currentRecIndex, setCurrentRecIndex] = useState(0);
   const canvasRef = useRef(null);
 
+  const removeUser = (userToRemove) => {
+    setUsers(users.filter(user => user !== userToRemove));
+  };
   function handleNextRecommendation() {
     setCurrentRecIndex((prevIndex) => {
       const nextIndex = prevIndex + 1;
@@ -234,6 +237,8 @@ function App() {
           poster={poster}
           selectedUsers={users}
           selectedGenres={genres}
+          removeUser={removeUser}
+          removeGenre={removeGenre}
           yearRange={[minYear, maxYear]}
           plotSummary={currentPlotSummary}
           actors={actors}
